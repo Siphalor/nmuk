@@ -84,7 +84,7 @@ public class MixinGameOptions {
 		Map<String, KeyBinding> keyBindings = KeyBindingAccessor.getKeysById();
 		Object2IntMap<KeyBinding> alternativeCountMap = new Object2IntOpenHashMap<>();
 		Queue<KeyBinding> newAlternatives = new ConcurrentLinkedQueue<>();
-		try (BufferedReader reader = new BufferedReader(new FileReader(nmukOptionsFile, StandardCharsets.UTF_8))) {
+		try (BufferedReader reader = new BufferedReader(new FileReader(nmukOptionsFile))) {
 			String line;
 			while ((line = reader.readLine()) != null) {
 				try {
