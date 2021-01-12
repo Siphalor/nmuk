@@ -1,0 +1,29 @@
+{
+	"schemaVersion": 1,
+	"id": "nmuk",
+	"version": "${version}",
+	"name": "No More Useless Keys",
+	"description": "Add multiple key (combinations) per keybinding",
+	"authors": [
+		"Siphalor"
+	],
+	"contributors": [],
+	"contact": {},
+	"license": "Apache-2.0",
+	"icon": "assets/nmuk/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"de.siphalor.nmuk.NMUK"
+		],
+		"client": [],
+		"server": []
+	},
+	"mixins": [
+		"nmuk.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.4.0",
+		"fabric": "*"
+	}
+}
