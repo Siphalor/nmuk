@@ -1,6 +1,6 @@
-package de.siphalor.nmuk.mixin;
+package de.siphalor.nmuk.impl.mixin;
 
-import de.siphalor.nmuk.util.IKeyBinding;
+import de.siphalor.nmuk.impl.IKeyBinding;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.InputUtil;
@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 import java.util.LinkedList;
 import java.util.List;
 
-@Mixin(KeyBinding.class)
+@Mixin(value = KeyBinding.class, priority = 800)
 public abstract class MixinKeyBinding implements IKeyBinding {
 	@Shadow private boolean pressed;
 	@Shadow @Final private String category;

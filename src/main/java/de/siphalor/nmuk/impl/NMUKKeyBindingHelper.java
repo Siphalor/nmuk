@@ -1,10 +1,10 @@
-package de.siphalor.nmuk;
+package de.siphalor.nmuk.impl;
 
-import de.siphalor.nmuk.mixin.ControlsOptionsScreenAccessor;
-import de.siphalor.nmuk.mixin.EntryListWidgetAccessor;
-import de.siphalor.nmuk.mixin.GameOptionsAccessor;
-import de.siphalor.nmuk.mixin.KeyBindingRegistryImplAccessor;
-import de.siphalor.nmuk.util.IKeyBinding;
+import de.siphalor.nmuk.NMUK;
+import de.siphalor.nmuk.impl.mixin.ControlsOptionsScreenAccessor;
+import de.siphalor.nmuk.impl.mixin.EntryListWidgetAccessor;
+import de.siphalor.nmuk.impl.mixin.GameOptionsAccessor;
+import de.siphalor.nmuk.impl.mixin.KeyBindingRegistryImplAccessor;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;

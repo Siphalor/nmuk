@@ -1,6 +1,5 @@
-package de.siphalor.nmuk;
+package de.siphalor.nmuk.impl;
 
-import de.siphalor.nmuk.util.IKeyBinding;
 import net.minecraft.client.options.KeyBinding;
 
 public class AlternativeKeyBinding extends KeyBinding {

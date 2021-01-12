@@ -1,4 +1,4 @@
-package de.siphalor.nmuk.mixin;
+package de.siphalor.nmuk.impl.mixin;
 
 import net.minecraft.client.gui.widget.EntryListWidget;
 import org.spongepowered.asm.mixin.Mixin;

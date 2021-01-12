@@ -1,9 +1,9 @@
-package de.siphalor.nmuk.mixin;
+package de.siphalor.nmuk.impl.mixin;
 
-import de.siphalor.nmuk.AlternativeKeyBinding;
+import de.siphalor.nmuk.impl.AlternativeKeyBinding;
 import de.siphalor.nmuk.NMUK;
-import de.siphalor.nmuk.NMUKKeyBindingHelper;
-import de.siphalor.nmuk.util.IKeyBinding;
+import de.siphalor.nmuk.impl.NMUKKeyBindingHelper;
+import de.siphalor.nmuk.impl.IKeyBinding;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.client.MinecraftClient;

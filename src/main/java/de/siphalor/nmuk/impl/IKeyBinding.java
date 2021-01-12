@@ -1,4 +1,4 @@
-package de.siphalor.nmuk.util;
+package de.siphalor.nmuk.impl;
 
 import net.minecraft.client.options.KeyBinding;
 

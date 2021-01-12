@@ -1,8 +1,8 @@
-package de.siphalor.nmuk.mixin;
+package de.siphalor.nmuk.impl.mixin;
 
 import com.google.common.collect.ImmutableList;
-import de.siphalor.nmuk.NMUKKeyBindingHelper;
-import de.siphalor.nmuk.util.IKeyBinding;
+import de.siphalor.nmuk.impl.NMUKKeyBindingHelper;
+import de.siphalor.nmuk.impl.IKeyBinding;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.options.ControlsListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;

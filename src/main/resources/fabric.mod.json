@@ -13,9 +13,7 @@
 	"icon": "assets/nmuk/icon.png",
 	"environment": "*",
 	"entrypoints": {
-		"main": [
-			"de.siphalor.nmuk.NMUK"
-		],
+		"main": [],
 		"client": [],
 		"server": []
 	},

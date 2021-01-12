@@ -1,4 +1,4 @@
-package de.siphalor.nmuk.mixin;
+package de.siphalor.nmuk.impl.mixin;
 
 import net.minecraft.client.gui.screen.options.ControlsListWidget;
 import net.minecraft.client.gui.screen.options.ControlsOptionsScreen;
