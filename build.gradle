@@ -7,7 +7,7 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 archivesBaseName = project.archives_base_name
-version = project.mod_version
+version = "${project.mod_version}+mc${project.minecraft_version}"
 group = project.maven_group
 
 sourceSets {
@@ -77,11 +77,9 @@ jar {
 publishing {
 	publications {
 		mavenJava(MavenPublication) {
+			artifactId = "${project.archives_base_name}-${project.minecraft_major_version}"
 			// add all the jars that should be included when publishing to maven
-			artifact(jar) {
-				builtBy remapJar
-			}
-			artifact("${project.buildDir.absolutePath}/libs/${archivesBaseName}-${project.version}.jar"){
+			artifact(remapJar) {
 				builtBy remapJar
 			}
 			artifact(sourcesJar) {
@@ -92,7 +90,15 @@ publishing {
 
 	// select the repositories you want to publish to
 	repositories {
-		// uncomment to publish to the local maven
-		// mavenLocal()
+		if (project.hasProperty("siphalorMavenUser")) {
+			maven {
+				name = "Siphalor"
+				url = "https://maven.siphalor.de/upload.php"
+				credentials {
+					username = siphalorMavenUser
+					password = siphalorMavenPassword
+				}
+			}
+		}
 	}
 }
