@@ -108,11 +108,11 @@ public class NMUKKeyBindingHelper {
 
 	public static ControlsListWidget.KeyBindingEntry createKeyBindingEntry(ControlsListWidget listWidget, KeyBinding binding, Text text) {
 		try {
-			//noinspection rawtypes
-			Constructor constructor = ControlsListWidget.KeyBindingEntry.class.getDeclaredConstructors()[0];
+			// noinspection JavaReflectionMemberAccess,JavaReflectionMemberAccess
+			Constructor<ControlsListWidget.KeyBindingEntry> constructor = ControlsListWidget.KeyBindingEntry.class.getDeclaredConstructor(ControlsListWidget.class, KeyBinding.class, Text.class);
 			constructor.setAccessible(true);
-			return (ControlsListWidget.KeyBindingEntry) constructor.newInstance(listWidget, binding, text);
-		} catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
+			return constructor.newInstance(listWidget, binding, text);
+		} catch (IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException e) {
 			e.printStackTrace();
 		}
 		return null;
