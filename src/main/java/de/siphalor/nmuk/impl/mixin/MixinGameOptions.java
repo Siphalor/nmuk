@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-@Mixin(GameOptions.class)
+@Mixin(value = GameOptions.class, priority = 800)
 public class MixinGameOptions {
 	@Unique
 	private File nmukOptionsFile;

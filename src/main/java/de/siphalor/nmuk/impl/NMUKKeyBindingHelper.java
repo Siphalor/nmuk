@@ -77,6 +77,10 @@ public class NMUKKeyBindingHelper {
 		KeyBinding.updateKeysByCode();
 	}
 
+	public static void resetSingleKeyBinding(KeyBinding keyBinding) {
+		keyBinding.setBoundKey(keyBinding.getDefaultKey());
+	}
+
 	public static KeyBinding createAlternativeKeyBinding(KeyBinding base) {
 		return createAlternativeKeyBinding(base, -1);
 	}
@@ -87,7 +91,7 @@ public class NMUKKeyBindingHelper {
 
 	public static KeyBinding createAlternativeKeyBinding(KeyBinding base, InputUtil.Type type, int code) {
 		IKeyBinding parent = (IKeyBinding) base;
-		KeyBinding alt = new AlternativeKeyBinding(base, base.getTranslationKey() + "%" + parent.nmuk_getAlternativesCount(), type, code, base.getCategory());
+		KeyBinding alt = new AlternativeKeyBinding(base, base.getTranslationKey() + "%" + parent.nmuk_getNextChildId(), type, code, base.getCategory());
 		parent.nmuk_addAlternative(alt);
 		return alt;
 	}

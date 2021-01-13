@@ -7,6 +7,7 @@ import java.util.List;
 
 @ApiStatus.Internal
 public interface IKeyBinding {
+	short nmuk_getNextChildId();
 	boolean nmuk_isAlternative();
 	KeyBinding nmuk_getParent();
 	void nmuk_setParent(KeyBinding binding);
@@ -15,5 +16,4 @@ public interface IKeyBinding {
 	void nmuk_removeAlternative(KeyBinding binding);
 	void nmuk_addAlternative(KeyBinding binding);
 	int nmuk_getIndexInParent();
-
 }

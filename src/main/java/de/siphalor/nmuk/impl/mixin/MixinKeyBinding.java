@@ -1,6 +1,7 @@
 package de.siphalor.nmuk.impl.mixin;
 
 import de.siphalor.nmuk.impl.IKeyBinding;
+import de.siphalor.nmuk.impl.NMUKKeyBindingHelper;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.InputUtil;
@@ -15,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -27,7 +29,14 @@ public abstract class MixinKeyBinding implements IKeyBinding {
 	@Unique
 	private List<KeyBinding> children = null;
 	@Unique
+	short nextChildId = 0;
+	@Unique
 	private KeyBinding parent = null;
+
+	@Override
+	public short nmuk_getNextChildId() {
+		return nextChildId++;
+	}
 
 	@Override
 	public boolean nmuk_isAlternative() {
@@ -75,7 +84,11 @@ public abstract class MixinKeyBinding implements IKeyBinding {
 
 	@Override
 	public int nmuk_getIndexInParent() {
-		return Integer.parseInt(StringUtils.substringAfterLast(translationKey, "%"));
+		if (parent == null) {
+			return 0;
+		}
+		//noinspection RedundantCast
+		return ((IKeyBinding) parent).nmuk_getAlternatives().indexOf((KeyBinding)(Object) this);
 	}
 
 	@Inject(
@@ -167,6 +180,37 @@ public abstract class MixinKeyBinding implements IKeyBinding {
 			for (KeyBinding child : children) {
 				if (child.matchesMouse(code)) {
 					cir.setReturnValue(true);
+				}
+			}
+		}
+	}
+
+	@Inject(
+			method = "isDefault",
+			at = @At("RETURN"),
+			cancellable = true
+	)
+	public void isDefaultInjection(CallbackInfoReturnable<Boolean> cir) {
+		if (parent == null) {
+			Collection<KeyBinding> defaults = NMUKKeyBindingHelper.defaultAlternatives.get((KeyBinding) (Object) this);
+			if (defaults.isEmpty()) {
+				if (children != null && !children.isEmpty()) {
+					cir.setReturnValue(false);
+				}
+			} else {
+				if (defaults.size() == children.size()) {
+					for (KeyBinding child : children) {
+						if (!defaults.contains(child)) {
+							cir.setReturnValue(false);
+							return;
+						}
+						if (!child.isDefault()) {
+							cir.setReturnValue(false);
+							return;
+						}
+					}
+				} else {
+					cir.setReturnValue(false);
 				}
 			}
 		}

@@ -3,13 +3,16 @@ package de.siphalor.nmuk.impl.mixin;
 import com.google.common.collect.ImmutableList;
 import de.siphalor.nmuk.impl.IKeyBinding;
 import de.siphalor.nmuk.impl.NMUKKeyBindingHelper;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.options.ControlsListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -17,16 +20,22 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 @Mixin(ControlsListWidget.KeyBindingEntry.class)
 public class MixinKeyBindingEntry {
 	private static final Text ENTRY_NAME = new LiteralText("    ->");
+	private static final Text RESET_TOOLTIP = new TranslatableText("nmuk.options.controls.reset.tooltip");
 
 	@Shadow @Final private ButtonWidget resetButton;
 	@Shadow @Final private ButtonWidget editButton;
 	@Mutable
 	@Shadow @Final private Text bindingName;
+	// This is a synthetic field containing the outer class instance
+	@Shadow(aliases = "field_2742", remap = false)
+	@Final private ControlsListWidget listWidget;
 	@Unique
 	private ButtonWidget alternativesButton;
 
@@ -55,14 +64,52 @@ public class MixinKeyBindingEntry {
 						for (int i = 0, entriesSize = entries.size(); i < entriesSize; i++) {
 							//noinspection ConstantConditions,RedundantCast,RedundantCast
 							if (entries.get(i) == (ControlsListWidget.KeyBindingEntry)(Object) this) {
-								i += ((IKeyBinding) altBinding).nmuk_getIndexInParent();
-								entries.add(i + 1, altEntry);
+								i += ((IKeyBinding) binding).nmuk_getAlternativesCount();
+								entries.add(i, altEntry);
 								break;
 							}
 						}
 					}
 				}
 			});
+			((ButtonWidgetAccessor) resetButton).setTooltipSupplier((button, matrices, mouseX, mouseY) ->
+				MinecraftClient.getInstance().currentScreen.renderTooltip(matrices, RESET_TOOLTIP, mouseX, mouseY)
+			);
+		}
+	}
+
+	@SuppressWarnings("UnresolvedMixinReference")
+	@Inject(method = "method_19870(Lnet/minecraft/client/options/KeyBinding;Lnet/minecraft/client/gui/widget/ButtonWidget;)V", at = @At("HEAD"))
+	private void resetButtonPressed(KeyBinding keyBinding, ButtonWidget widget, CallbackInfo ci) {
+		if (((IKeyBinding) keyBinding).nmuk_getParent() == null && Screen.hasShiftDown()) {
+			List<KeyBinding> alternatives = ((IKeyBinding) keyBinding).nmuk_getAlternatives();
+			List<KeyBinding> defaultAlternatives = new ArrayList<>(NMUKKeyBindingHelper.defaultAlternatives.get(keyBinding));
+			List<ControlsListWidget.KeyBindingEntry> entries = NMUKKeyBindingHelper.getControlsListWidgetEntries();
+			// noinspection ConstantConditions,RedundantCast
+			int entryPos = entries.indexOf((ControlsListWidget.KeyBindingEntry)(Object) this);
+
+			int index;
+			for (Iterator<KeyBinding> iterator = alternatives.iterator(); iterator.hasNext(); ) {
+				KeyBinding alternative = iterator.next();
+				index = defaultAlternatives.indexOf(alternative);
+				if (index == -1) {
+					entries.remove(entryPos + 1 + ((IKeyBinding) alternative).nmuk_getIndexInParent());
+					iterator.remove();
+					NMUKKeyBindingHelper.removeKeyBinding(alternative);
+					continue;
+				}
+				defaultAlternatives.remove(index);
+				NMUKKeyBindingHelper.resetSingleKeyBinding(alternative);
+			}
+			entryPos += alternatives.size();
+
+			ControlsListWidget.KeyBindingEntry entry;
+			NMUKKeyBindingHelper.registerKeyBindings(MinecraftClient.getInstance().options, defaultAlternatives);
+			for (KeyBinding defaultAlternative : defaultAlternatives) {
+				entry = NMUKKeyBindingHelper.createKeyBindingEntry(listWidget, defaultAlternative, ENTRY_NAME);
+				entries.add(++entryPos, entry);
+				NMUKKeyBindingHelper.resetSingleKeyBinding(defaultAlternative);
+			}
 		}
 	}
 
