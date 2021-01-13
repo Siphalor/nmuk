@@ -1,5 +1,7 @@
 package de.siphalor.nmuk.impl;
 
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import de.siphalor.nmuk.NMUK;
 import de.siphalor.nmuk.impl.mixin.ControlsOptionsScreenAccessor;
 import de.siphalor.nmuk.impl.mixin.EntryListWidgetAccessor;
@@ -11,16 +13,23 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.options.ControlsListWidget;
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.Level;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
+@ApiStatus.Internal
 public class NMUKKeyBindingHelper {
+	public static final Multimap<KeyBinding, KeyBinding> defaultAlternatives = Multimaps.newSetMultimap(new HashMap<>(), HashSet::new);
+
 	public static void removeKeyBinding(KeyBinding binding) {
 		List<KeyBinding> moddedKeyBindings = KeyBindingRegistryImplAccessor.getModdedKeyBindings();
 		{
@@ -43,11 +52,13 @@ public class NMUKKeyBindingHelper {
 	public static void registerKeyBinding(KeyBinding binding) {
 		KeyBindingHelper.registerKeyBinding(binding);
 		GameOptionsAccessor options = (GameOptionsAccessor) MinecraftClient.getInstance().options;
-		KeyBinding[] keysAll = options.getKeysAll();
-		KeyBinding[] newKeysAll = new KeyBinding[keysAll.length + 1];
-		System.arraycopy(keysAll, 0, newKeysAll, 0, keysAll.length);
-		newKeysAll[keysAll.length] = binding;
-		options.setKeysAll(newKeysAll);
+		if (options != null) { // Game is during initialization - this is handled by Fapi already
+			KeyBinding[] keysAll = options.getKeysAll();
+			KeyBinding[] newKeysAll = new KeyBinding[keysAll.length + 1];
+			System.arraycopy(keysAll, 0, newKeysAll, 0, keysAll.length);
+			newKeysAll[keysAll.length] = binding;
+			options.setKeysAll(newKeysAll);
+		}
 		KeyBinding.updateKeysByCode();
 	}
 
@@ -67,8 +78,16 @@ public class NMUKKeyBindingHelper {
 	}
 
 	public static KeyBinding createAlternativeKeyBinding(KeyBinding base) {
+		return createAlternativeKeyBinding(base, -1);
+	}
+
+	public static KeyBinding createAlternativeKeyBinding(KeyBinding base, int code) {
+		return createAlternativeKeyBinding(base, InputUtil.Type.KEYSYM, code);
+	}
+
+	public static KeyBinding createAlternativeKeyBinding(KeyBinding base, InputUtil.Type type, int code) {
 		IKeyBinding parent = (IKeyBinding) base;
-		KeyBinding alt = new AlternativeKeyBinding(base, base.getTranslationKey() + "%" + parent.nmuk_getAlternativesCount(), -1, base.getCategory());
+		KeyBinding alt = new AlternativeKeyBinding(base, base.getTranslationKey() + "%" + parent.nmuk_getAlternativesCount(), type, code, base.getCategory());
 		parent.nmuk_addAlternative(alt);
 		return alt;
 	}
