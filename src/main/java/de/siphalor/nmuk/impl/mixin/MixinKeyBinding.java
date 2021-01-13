@@ -24,7 +24,7 @@ import java.util.List;
 public abstract class MixinKeyBinding implements IKeyBinding {
 	@Shadow private boolean pressed;
 	@Shadow @Final private String category;
-	@Shadow @Final private String translationKey;
+	@Shadow @Final private String id;
 
 	@Unique
 	private List<KeyBinding> children = null;
@@ -102,7 +102,7 @@ public abstract class MixinKeyBinding implements IKeyBinding {
 			cancellable = true,
 			locals = LocalCapture.CAPTURE_FAILSOFT
 	)
-	private static void onKeyPressed(InputUtil.Key key, CallbackInfo callbackInfo, KeyBinding binding) {
+	private static void onKeyPressed(InputUtil.KeyCode key, CallbackInfo callbackInfo, KeyBinding binding) {
 		KeyBinding parent = ((IKeyBinding) binding).nmuk_getParent();
 		if (parent != null) {
 			((KeyBindingAccessor) parent).setTimesPressed(((KeyBindingAccessor) parent).getTimesPressed() + 1);
@@ -152,8 +152,8 @@ public abstract class MixinKeyBinding implements IKeyBinding {
 					cir.setReturnValue(Integer.compare(nmuk_getIndexInParent(), ((IKeyBinding) other).nmuk_getIndexInParent()));
 				} else {
 					cir.setReturnValue(
-							I18n.translate(StringUtils.substringBeforeLast(translationKey, "%"))
-									.compareTo(I18n.translate(StringUtils.substringBeforeLast(other.getTranslationKey(), "%")))
+							I18n.translate(StringUtils.substringBeforeLast(id, "%"))
+									.compareTo(I18n.translate(StringUtils.substringBeforeLast(other.getId(), "%")))
 					);
 				}
 			}

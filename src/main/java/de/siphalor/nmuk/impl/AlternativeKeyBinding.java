@@ -18,7 +18,7 @@ public class AlternativeKeyBinding extends KeyBinding {
 
 	@Override
 	public boolean isDefault() {
-		if (getDefaultKey() == InputUtil.UNKNOWN_KEY) {
+		if (getDefaultKeyCode() == InputUtil.UNKNOWN_KEYCODE) {
 			return true;
 		}
 		return super.isDefault();

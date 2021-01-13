@@ -1,16 +1,15 @@
 package de.siphalor.nmuk.impl.mixin;
 
-import de.siphalor.nmuk.impl.AlternativeKeyBinding;
 import de.siphalor.nmuk.NMUK;
-import de.siphalor.nmuk.impl.NMUKKeyBindingHelper;
+import de.siphalor.nmuk.impl.AlternativeKeyBinding;
 import de.siphalor.nmuk.impl.IKeyBinding;
+import de.siphalor.nmuk.impl.NMUKKeyBindingHelper;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.util.InputUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
@@ -61,7 +60,7 @@ public class MixinGameOptions {
 		try (PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(new FileOutputStream(nmukOptionsFile), StandardCharsets.UTF_8))) {
 			for (KeyBinding binding : keysAll) {
 				if (binding.getClass() == AlternativeKeyBinding.class) {
-					printWriter.println("key_" + binding.getTranslationKey() + ":" + binding.getBoundKeyTranslationKey());
+					printWriter.println("key_" + binding.getId() + ":" + binding.getName());
 				}
 			}
 		} catch (FileNotFoundException e) {
@@ -107,7 +106,7 @@ public class MixinGameOptions {
 					}
 					short altId = Short.parseShort(id.substring(stringIndex + 1));
 					id = id.substring(0, stringIndex);
-					InputUtil.Key boundKey = InputUtil.fromTranslationKey(keyId);
+					InputUtil.KeyCode boundKey = InputUtil.fromName(keyId);
 					//noinspection ConstantConditions
 					KeyBinding base = keyBindings.get(id);
 					if (base != null) {
@@ -116,14 +115,14 @@ public class MixinGameOptions {
 						((IKeyBinding) base).nmuk_setNextChildId(altId);
 						if (children == null) {
 							KeyBinding alternative = NMUKKeyBindingHelper.createAlternativeKeyBinding(base);
-							alternative.setBoundKey(boundKey);
+							alternative.setKeyCode(boundKey);
 							newAlternatives.add(alternative);
 						} else {
 							if (index < children.size()) {
-								children.get(index).setBoundKey(boundKey);
+								children.get(index).setKeyCode(boundKey);
 							} else {
 								KeyBinding alternative = NMUKKeyBindingHelper.createAlternativeKeyBinding(base);
-								alternative.setBoundKey(boundKey);
+								alternative.setKeyCode(boundKey);
 								newAlternatives.add(alternative);
 							}
 						}

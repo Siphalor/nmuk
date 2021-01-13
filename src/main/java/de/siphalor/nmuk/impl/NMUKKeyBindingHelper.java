@@ -78,7 +78,7 @@ public class NMUKKeyBindingHelper {
 	}
 
 	public static void resetSingleKeyBinding(KeyBinding keyBinding) {
-		keyBinding.setBoundKey(keyBinding.getDefaultKey());
+		keyBinding.setKeyCode(keyBinding.getDefaultKeyCode());
 	}
 
 	public static KeyBinding createAlternativeKeyBinding(KeyBinding base) {
@@ -91,7 +91,7 @@ public class NMUKKeyBindingHelper {
 
 	public static KeyBinding createAlternativeKeyBinding(KeyBinding base, InputUtil.Type type, int code) {
 		IKeyBinding parent = (IKeyBinding) base;
-		KeyBinding alt = new AlternativeKeyBinding(base, base.getTranslationKey() + "%" + parent.nmuk_getNextChildId(), type, code, base.getCategory());
+		KeyBinding alt = new AlternativeKeyBinding(base, base.getId() + "%" + parent.nmuk_getNextChildId(), type, code, base.getCategory());
 		parent.nmuk_addAlternative(alt);
 		return alt;
 	}
@@ -106,12 +106,12 @@ public class NMUKKeyBindingHelper {
 		return null;
 	}
 
-	public static ControlsListWidget.KeyBindingEntry createKeyBindingEntry(ControlsListWidget listWidget, KeyBinding binding, Text text) {
+	public static ControlsListWidget.KeyBindingEntry createKeyBindingEntry(ControlsListWidget listWidget, KeyBinding binding) {
 		try {
 			// noinspection JavaReflectionMemberAccess,JavaReflectionMemberAccess
-			Constructor<ControlsListWidget.KeyBindingEntry> constructor = ControlsListWidget.KeyBindingEntry.class.getDeclaredConstructor(ControlsListWidget.class, KeyBinding.class, Text.class);
+			Constructor<ControlsListWidget.KeyBindingEntry> constructor = ControlsListWidget.KeyBindingEntry.class.getDeclaredConstructor(ControlsListWidget.class, KeyBinding.class);
 			constructor.setAccessible(true);
-			return constructor.newInstance(listWidget, binding, text);
+			return constructor.newInstance(listWidget, binding);
 		} catch (IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException e) {
 			e.printStackTrace();
 		}
