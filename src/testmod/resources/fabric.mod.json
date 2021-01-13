@@ -1,0 +1,25 @@
+{
+	"schemaVersion": 1,
+	"id": "nmuk_testmod",
+	"version": "0.0.0",
+	"name": "No More Useless Keys - Test Mod",
+	"description": "Test Mod",
+	"authors": [
+		"Siphalor"
+	],
+	"contributors": [],
+	"contact": {},
+	"license": "Apache-2.0",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"de.siphalor.nmuktestmod.NMUKTestMod"
+		],
+		"client": [],
+		"server": []
+	},
+	"depends": {
+		"fabricloader": ">=0.4.0",
+		"fabric": "*"
+	}
+}
