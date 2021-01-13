@@ -1,8 +1,8 @@
 package de.siphalor.nmuk.impl.mixin;
 
 import com.google.common.collect.ImmutableList;
-import de.siphalor.nmuk.impl.NMUKKeyBindingHelper;
 import de.siphalor.nmuk.impl.IKeyBinding;
+import de.siphalor.nmuk.impl.NMUKKeyBindingHelper;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.options.ControlsListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -52,9 +52,14 @@ public class MixinKeyBindingEntry {
 				if (altEntry != null) {
 					List<ControlsListWidget.KeyBindingEntry> entries = NMUKKeyBindingHelper.getControlsListWidgetEntries();
 					if (entries != null) {
-						//noinspection RedundantCast
-						int index = entries.indexOf((ControlsListWidget.KeyBindingEntry)(Object) this);
-						entries.add(index + 1, altEntry);
+						for (int i = 0, entriesSize = entries.size(); i < entriesSize; i++) {
+							//noinspection ConstantConditions,RedundantCast,RedundantCast
+							if (entries.get(i) == (ControlsListWidget.KeyBindingEntry)(Object) this) {
+								i += ((IKeyBinding) altBinding).nmuk_getIndexInParent();
+								entries.add(i + 1, altEntry);
+								break;
+							}
+						}
 					}
 				}
 			});
