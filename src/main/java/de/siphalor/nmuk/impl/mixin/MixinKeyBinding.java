@@ -39,6 +39,11 @@ public abstract class MixinKeyBinding implements IKeyBinding {
 	}
 
 	@Override
+	public void nmuk_setNextChildId(short nextChildId) {
+		this.nextChildId = nextChildId;
+	}
+
+	@Override
 	public boolean nmuk_isAlternative() {
 		return parent != null;
 	}

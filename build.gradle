@@ -20,6 +20,14 @@ sourceSets {
 minecraft {
 }
 
+repositories {
+	maven {
+		name "Siphalor's Maven"
+		url "https://maven.siphalor.de"
+	}
+	mavenLocal()
+}
+
 dependencies {
 	//to change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -27,6 +35,8 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+
+	modCompile "de.siphalor:amecsapi-1.16:1.1.2-alpha.0+"
 
 	testmodCompile sourceSets.main.output
 }

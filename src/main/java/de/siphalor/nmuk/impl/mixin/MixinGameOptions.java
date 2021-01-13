@@ -61,7 +61,7 @@ public class MixinGameOptions {
 		try (PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(new FileOutputStream(nmukOptionsFile), StandardCharsets.UTF_8))) {
 			for (KeyBinding binding : keysAll) {
 				if (binding.getClass() == AlternativeKeyBinding.class) {
-					printWriter.println("key_" + StringUtils.substringBeforeLast(binding.getTranslationKey(), "%") + ":" + binding.getBoundKeyTranslationKey());
+					printWriter.println("key_" + binding.getTranslationKey() + ":" + binding.getBoundKeyTranslationKey());
 				}
 			}
 		} catch (FileNotFoundException e) {
@@ -88,23 +88,32 @@ public class MixinGameOptions {
 			String line;
 			while ((line = reader.readLine()) != null) {
 				try {
-					int colon = line.lastIndexOf(':');
-					if (colon <= 0) {
+					int stringIndex = line.lastIndexOf(':');
+					if (stringIndex <= 0) {
 						NMUK.log(Level.WARN, "Invalid nmuk options line: " + line);
 						continue;
 					}
-					String id = line.substring(0, colon);
+					String id = line.substring(0, stringIndex);
+					String keyId = line.substring(stringIndex + 1);
 					if (!id.startsWith("key_")) {
 						NMUK.log(Level.WARN, "Invalid nmuk options entry: " + id);
 						continue;
 					}
 					id = id.substring(4);
-					InputUtil.Key boundKey = InputUtil.fromTranslationKey(line.substring(colon + 1));
+					stringIndex = id.indexOf('%');
+					if (stringIndex <= 0) {
+						NMUK.log(Level.WARN, "Nmuk entry is missing an alternative id");
+						continue;
+					}
+					short altId = Short.parseShort(id.substring(stringIndex + 1));
+					id = id.substring(0, stringIndex);
+					InputUtil.Key boundKey = InputUtil.fromTranslationKey(keyId);
 					//noinspection ConstantConditions
 					KeyBinding base = keyBindings.get(id);
 					if (base != null) {
 						int index = alternativeCountMap.getOrDefault(base, 0);
 						List<KeyBinding> children = ((IKeyBinding) base).nmuk_getAlternatives();
+						((IKeyBinding) base).nmuk_setNextChildId(altId);
 						if (children == null) {
 							KeyBinding alternative = NMUKKeyBindingHelper.createAlternativeKeyBinding(base);
 							alternative.setBoundKey(boundKey);
