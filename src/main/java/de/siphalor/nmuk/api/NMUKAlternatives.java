@@ -5,6 +5,9 @@ import de.siphalor.nmuk.impl.NMUKKeyBindingHelper;
 import de.siphalor.nmuk.impl.mixin.KeyBindingAccessor;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.util.InputUtil;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 /**
  * Main API class of NMUK (No More Useless Keys).<br />
@@ -47,5 +50,33 @@ public class NMUKAlternatives {
 		((IKeyBinding) alternative).nmuk_setParent(base);
 		NMUKKeyBindingHelper.registerKeyBinding(alternative);
 		NMUKKeyBindingHelper.defaultAlternatives.put(base, alternative);
+	}
+
+	/**
+	 * Returns whether the given keybinding is an alternative.
+	 * @param binding A keybinding
+	 * @return Whether the given keybinding is an alternative
+	 */
+	public static boolean isAlternative(KeyBinding binding) {
+		return ((IKeyBinding) binding).nmuk_isAlternative();
+	}
+
+	/**
+	 * Gets all alternatives that are registered for a keybinding.
+	 * @param binding A keyinding
+	 * @return A list of alternatives or <code>null</code>
+	 */
+	@Nullable
+	public static List<KeyBinding> getAlternatives(KeyBinding binding) {
+		return ((IKeyBinding) binding).nmuk_getAlternatives();
+	}
+
+	/**
+	 * Gets the base keybinding for an alternative keybinding.
+	 * @param binding An alternative keybinding
+	 * @return The base keyinding or <code>null</code> if the given keybinding is no alternative
+	 */
+	public static KeyBinding getBase(KeyBinding binding) {
+		return ((IKeyBinding) binding).nmuk_getParent();
 	}
 }
