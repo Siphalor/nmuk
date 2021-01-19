@@ -14,6 +14,10 @@ public interface KeyBindingAccessor {
 	}
 
 	@Accessor
+	void setId(String id);
+	@Accessor
+	void setCategory(String category);
+	@Accessor
 	int getTimesPressed();
 	@Accessor
 	void setTimesPressed(int timesPressed);

@@ -1,7 +1,6 @@
 package de.siphalor.nmuk.impl.mixin;
 
 import de.siphalor.nmuk.NMUK;
-import de.siphalor.nmuk.impl.AlternativeKeyBinding;
 import de.siphalor.nmuk.impl.IKeyBinding;
 import de.siphalor.nmuk.impl.NMUKKeyBindingHelper;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
@@ -41,7 +40,7 @@ public class MixinGameOptions {
 	)
 	public void removeNMUKBindings(CallbackInfo ci) {
 		tempKeysAll = keysAll;
-		keysAll = Arrays.stream(keysAll).filter(binding -> binding.getClass() != AlternativeKeyBinding.class).toArray(KeyBinding[]::new);
+		keysAll = Arrays.stream(keysAll).filter(binding -> !((IKeyBinding) binding).nmuk_isAlternative()).toArray(KeyBinding[]::new);
 	}
 
 	@Inject(
@@ -59,7 +58,7 @@ public class MixinGameOptions {
 	public void save(CallbackInfo ci) {
 		try (PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(new FileOutputStream(nmukOptionsFile), StandardCharsets.UTF_8))) {
 			for (KeyBinding binding : keysAll) {
-				if (binding.getClass() == AlternativeKeyBinding.class) {
+				if (((IKeyBinding) binding).nmuk_isAlternative()) {
 					printWriter.println("key_" + binding.getId() + ":" + binding.getName());
 				}
 			}
