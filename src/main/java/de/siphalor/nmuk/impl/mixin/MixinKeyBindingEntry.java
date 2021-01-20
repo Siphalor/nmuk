@@ -1,3 +1,20 @@
+/*
+ * Copyright 2021 Siphalor
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied.
+ * See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
 package de.siphalor.nmuk.impl.mixin;
 
 import com.google.common.collect.ImmutableList;
@@ -29,13 +46,20 @@ public class MixinKeyBindingEntry {
 	private static final Text ENTRY_NAME = new LiteralText("    ->");
 	private static final Text RESET_TOOLTIP = new TranslatableText("nmuk.options.controls.reset.tooltip");
 
-	@Shadow @Final private ButtonWidget resetButton;
-	@Shadow @Final private ButtonWidget editButton;
+	@Shadow
+	@Final
+	private ButtonWidget resetButton;
+	@Shadow
+	@Final
+	private ButtonWidget editButton;
 	@Mutable
-	@Shadow @Final private Text bindingName;
+	@Shadow
+	@Final
+	private Text bindingName;
 	// This is a synthetic field containing the outer class instance
 	@Shadow(aliases = "field_2742", remap = false)
-	@Final private ControlsListWidget listWidget;
+	@Final
+	private ControlsListWidget listWidget;
 	@Unique
 	private ButtonWidget alternativesButton;
 
@@ -63,7 +87,7 @@ public class MixinKeyBindingEntry {
 					if (entries != null) {
 						for (int i = 0, entriesSize = entries.size(); i < entriesSize; i++) {
 							//noinspection ConstantConditions,RedundantCast,RedundantCast
-							if (entries.get(i) == (ControlsListWidget.KeyBindingEntry)(Object) this) {
+							if (entries.get(i) == (ControlsListWidget.KeyBindingEntry) (Object) this) {
 								i += ((IKeyBinding) binding).nmuk_getAlternativesCount();
 								entries.add(i, altEntry);
 								break;
@@ -72,8 +96,9 @@ public class MixinKeyBindingEntry {
 					}
 				}
 			});
+			//noinspection ConstantConditions
 			((ButtonWidgetAccessor) resetButton).setTooltipSupplier((button, matrices, mouseX, mouseY) ->
-				MinecraftClient.getInstance().currentScreen.renderTooltip(matrices, RESET_TOOLTIP, mouseX, mouseY)
+					MinecraftClient.getInstance().currentScreen.renderTooltip(matrices, RESET_TOOLTIP, mouseX, mouseY)
 			);
 		}
 	}
@@ -86,7 +111,7 @@ public class MixinKeyBindingEntry {
 			List<KeyBinding> defaultAlternatives = new ArrayList<>(NMUKKeyBindingHelper.defaultAlternatives.get(keyBinding));
 			List<ControlsListWidget.KeyBindingEntry> entries = NMUKKeyBindingHelper.getControlsListWidgetEntries();
 			// noinspection ConstantConditions,RedundantCast
-			int entryPos = entries.indexOf((ControlsListWidget.KeyBindingEntry)(Object) this);
+			int entryPos = entries.indexOf((ControlsListWidget.KeyBindingEntry) (Object) this);
 
 			int index;
 			for (Iterator<KeyBinding> iterator = alternatives.iterator(); iterator.hasNext(); ) {

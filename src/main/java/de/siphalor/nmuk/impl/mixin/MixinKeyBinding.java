@@ -1,3 +1,20 @@
+/*
+ * Copyright 2021 Siphalor
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied.
+ * See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
 package de.siphalor.nmuk.impl.mixin;
 
 import de.siphalor.nmuk.impl.IKeyBinding;
@@ -22,9 +39,14 @@ import java.util.List;
 
 @Mixin(value = KeyBinding.class, priority = 800)
 public abstract class MixinKeyBinding implements IKeyBinding {
-	@Shadow private boolean pressed;
-	@Shadow @Final private String category;
-	@Shadow @Final private String translationKey;
+	@Shadow
+	private boolean pressed;
+	@Shadow
+	@Final
+	private String category;
+	@Shadow
+	@Final
+	private String translationKey;
 
 	@Unique
 	private List<KeyBinding> children = null;
@@ -93,7 +115,7 @@ public abstract class MixinKeyBinding implements IKeyBinding {
 			return 0;
 		}
 		//noinspection RedundantCast
-		return ((IKeyBinding) parent).nmuk_getAlternatives().indexOf((KeyBinding)(Object) this);
+		return ((IKeyBinding) parent).nmuk_getAlternatives().indexOf((KeyBinding) (Object) this);
 	}
 
 	@Inject(
