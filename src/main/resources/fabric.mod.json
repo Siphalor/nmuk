@@ -3,12 +3,16 @@
 	"id": "nmuk",
 	"version": "${version}",
 	"name": "No More Useless Keys",
-	"description": "Add multiple key (combinations) per keybinding",
+	"description": "Add multiple key combinations per keybinding",
 	"authors": [
 		"Siphalor"
 	],
 	"contributors": [],
-	"contact": {},
+	"contact": {
+		"sources": "https://github.com/Siphalor/nmuk",
+		"homepage": "https://github.com/Siphalor/nmuk",
+		"issues": "https://github.com/Siphalor/nmuk/issues"
+	},
 	"license": "Apache-2.0",
 	"icon": "assets/nmuk/icon.png",
 	"environment": "client",
