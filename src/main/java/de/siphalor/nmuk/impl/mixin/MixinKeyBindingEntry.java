@@ -6,9 +6,9 @@ import de.siphalor.nmuk.impl.NMUKKeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.options.ControlsListWidget;
+import net.minecraft.client.gui.screen.option.ControlsListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
@@ -79,7 +79,7 @@ public class MixinKeyBindingEntry {
 	}
 
 	@SuppressWarnings("UnresolvedMixinReference")
-	@Inject(method = "method_19870(Lnet/minecraft/client/options/KeyBinding;Lnet/minecraft/client/gui/widget/ButtonWidget;)V", at = @At("HEAD"))
+	@Inject(method = "method_19870(Lnet/minecraft/client/option/KeyBinding;Lnet/minecraft/client/gui/widget/ButtonWidget;)V", at = @At("HEAD"))
 	private void resetButtonPressed(KeyBinding keyBinding, ButtonWidget widget, CallbackInfo ci) {
 		if (((IKeyBinding) keyBinding).nmuk_getParent() == null && Screen.hasShiftDown()) {
 			List<KeyBinding> alternatives = ((IKeyBinding) keyBinding).nmuk_getAlternatives();

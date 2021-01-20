@@ -1,6 +1,6 @@
 package de.siphalor.nmuk.impl;
 
-import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.option.KeyBinding;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;

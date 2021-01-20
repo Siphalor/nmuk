@@ -3,7 +3,7 @@ package de.siphalor.nmuk.api;
 import de.siphalor.nmuk.impl.IKeyBinding;
 import de.siphalor.nmuk.impl.NMUKKeyBindingHelper;
 import de.siphalor.nmuk.impl.mixin.KeyBindingAccessor;
-import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import org.jetbrains.annotations.Nullable;
 

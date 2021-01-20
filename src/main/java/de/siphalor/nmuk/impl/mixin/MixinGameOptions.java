@@ -6,8 +6,8 @@ import de.siphalor.nmuk.impl.NMUKKeyBindingHelper;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.options.GameOptions;
-import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.option.GameOptions;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import org.apache.logging.log4j.Level;
 import org.spongepowered.asm.mixin.*;
@@ -36,7 +36,7 @@ public class MixinGameOptions {
 	// Prevent nmuk keybindings from getting saved to the Vanilla options file
 	@Inject(
 			method = "write",
-			at = @At(value = "FIELD", target = "Lnet/minecraft/client/options/GameOptions;keysAll:[Lnet/minecraft/client/options/KeyBinding;")
+			at = @At(value = "FIELD", target = "Lnet/minecraft/client/option/GameOptions;keysAll:[Lnet/minecraft/client/option/KeyBinding;")
 	)
 	public void removeNMUKBindings(CallbackInfo ci) {
 		tempKeysAll = keysAll;

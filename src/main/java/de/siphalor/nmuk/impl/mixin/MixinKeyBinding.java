@@ -2,7 +2,7 @@ package de.siphalor.nmuk.impl.mixin;
 
 import de.siphalor.nmuk.impl.IKeyBinding;
 import de.siphalor.nmuk.impl.NMUKKeyBindingHelper;
-import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.InputUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -98,7 +98,7 @@ public abstract class MixinKeyBinding implements IKeyBinding {
 
 	@Inject(
 			method = "onKeyPressed",
-			at = @At(value = "FIELD", target = "Lnet/minecraft/client/options/KeyBinding;timesPressed:I"),
+			at = @At(value = "FIELD", target = "Lnet/minecraft/client/option/KeyBinding;timesPressed:I"),
 			cancellable = true,
 			locals = LocalCapture.CAPTURE_FAILSOFT
 	)
