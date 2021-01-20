@@ -31,7 +31,9 @@ public class MixinGameOptions {
 	private KeyBinding[] tempKeysAll;
 
 	@Mutable
-	@Shadow @Final public KeyBinding[] keysAll;
+	@Shadow
+	@Final
+	public KeyBinding[] keysAll;
 
 	// Prevent nmuk keybindings from getting saved to the Vanilla options file
 	@Inject(
@@ -144,6 +146,6 @@ public class MixinGameOptions {
 				alternatives.subList(newCount, oldCount).clear();
 			}
 		}
-		NMUKKeyBindingHelper.registerKeyBindings((GameOptions)(Object) this, newAlternatives);
+		NMUKKeyBindingHelper.registerKeyBindings((GameOptions) (Object) this, newAlternatives);
 	}
 }

@@ -40,7 +40,7 @@ dependencies {
 	}
 
 	def fabric_deps = [
-			"fabric-api-base": "0.2.0+daa38b3d7d",
+			"fabric-api-base"          : "0.2.0+daa38b3d7d",
 			"fabric-key-binding-api-v1": "1.0.2+ca58154a7d",
 			"fabric-resource-loader-v0": "0.4.2+ca58154a7d"
 	]

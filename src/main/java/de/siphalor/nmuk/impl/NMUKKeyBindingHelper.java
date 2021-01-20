@@ -100,7 +100,7 @@ public class NMUKKeyBindingHelper {
 		Screen screen = MinecraftClient.getInstance().currentScreen;
 		if (screen instanceof ControlsOptionsScreenAccessor) {
 			//noinspection unchecked
-			return (List<ControlsListWidget.KeyBindingEntry>)(Object)
+			return (List<ControlsListWidget.KeyBindingEntry>) (Object)
 					((EntryListWidgetAccessor) ((ControlsOptionsScreenAccessor) screen).getKeyBindingListWidget()).getChildren();
 		}
 		return null;

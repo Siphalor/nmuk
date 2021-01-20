@@ -16,6 +16,7 @@ import java.util.List;
 public class NMUKAlternatives {
 	/**
 	 * Create an alternative keybinding with the given code and {@link InputUtil.Type#KEYSYM}.
+	 *
 	 * @param base The base keybinding to create an alternative for
 	 * @param code The keycode to use as default for the alternative
 	 */
@@ -25,9 +26,10 @@ public class NMUKAlternatives {
 
 	/**
 	 * Create an alternative keybinding with the given code and input type.
-	 * @param base The base keybinding to create an alternative for
+	 *
+	 * @param base      The base keybinding to create an alternative for
 	 * @param inputType The {@link InputUtil.Type} that defines the type of the code
-	 * @param code The input code
+	 * @param code      The input code
 	 */
 	public static void create(KeyBinding base, InputUtil.Type inputType, int code) {
 		KeyBinding alternative = NMUKKeyBindingHelper.createAlternativeKeyBinding(base, inputType, code);
@@ -40,7 +42,8 @@ public class NMUKAlternatives {
 	 * This is useful when using more complex keybinding trigger, e.g. in use with Amces.<br />
 	 * The translation key and the category of the alternative keybinding will be rewritten
 	 * and as such it must not be registered yet.
-	 * @param base The base keybinding to create an alternative for
+	 *
+	 * @param base        The base keybinding to create an alternative for
 	 * @param alternative The alternative keybinding. This keybinding MUST NOT be registered yet
 	 */
 	public static void create(KeyBinding base, KeyBinding alternative) {
@@ -54,6 +57,7 @@ public class NMUKAlternatives {
 
 	/**
 	 * Returns whether the given keybinding is an alternative.
+	 *
 	 * @param binding A keybinding
 	 * @return Whether the given keybinding is an alternative
 	 */
@@ -63,6 +67,7 @@ public class NMUKAlternatives {
 
 	/**
 	 * Gets all alternatives that are registered for a keybinding.
+	 *
 	 * @param binding A keyinding
 	 * @return A list of alternatives or <code>null</code>
 	 */
@@ -73,6 +78,7 @@ public class NMUKAlternatives {
 
 	/**
 	 * Gets the base keybinding for an alternative keybinding.
+	 *
 	 * @param binding An alternative keybinding
 	 * @return The base keyinding or <code>null</code> if the given keybinding is no alternative
 	 */

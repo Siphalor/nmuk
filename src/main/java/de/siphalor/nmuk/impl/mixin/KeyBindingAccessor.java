@@ -15,10 +15,13 @@ public interface KeyBindingAccessor {
 
 	@Accessor
 	void setTranslationKey(String id);
+
 	@Accessor
 	void setCategory(String category);
+
 	@Accessor
 	int getTimesPressed();
+
 	@Accessor
 	void setTimesPressed(int timesPressed);
 }

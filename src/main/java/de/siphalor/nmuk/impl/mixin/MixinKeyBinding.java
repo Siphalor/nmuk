@@ -22,9 +22,14 @@ import java.util.List;
 
 @Mixin(value = KeyBinding.class, priority = 800)
 public abstract class MixinKeyBinding implements IKeyBinding {
-	@Shadow private boolean pressed;
-	@Shadow @Final private String category;
-	@Shadow @Final private String translationKey;
+	@Shadow
+	private boolean pressed;
+	@Shadow
+	@Final
+	private String category;
+	@Shadow
+	@Final
+	private String translationKey;
 
 	@Unique
 	private List<KeyBinding> children = null;
@@ -93,7 +98,7 @@ public abstract class MixinKeyBinding implements IKeyBinding {
 			return 0;
 		}
 		//noinspection RedundantCast
-		return ((IKeyBinding) parent).nmuk_getAlternatives().indexOf((KeyBinding)(Object) this);
+		return ((IKeyBinding) parent).nmuk_getAlternatives().indexOf((KeyBinding) (Object) this);
 	}
 
 	@Inject(
