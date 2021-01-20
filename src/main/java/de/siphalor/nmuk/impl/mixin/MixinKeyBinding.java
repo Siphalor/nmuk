@@ -132,7 +132,7 @@ public abstract class MixinKeyBinding implements IKeyBinding {
 	private void resetInjection(CallbackInfo callbackInfo) {
 		if (children != null && !children.isEmpty()) {
 			for (KeyBinding child : children) {
-				child.setPressed(false);
+				((KeyBindingAccessor) child).setPressed(false);
 			}
 		}
 	}

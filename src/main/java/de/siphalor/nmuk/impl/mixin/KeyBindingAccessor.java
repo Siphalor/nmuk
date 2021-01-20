@@ -18,6 +18,8 @@ public interface KeyBindingAccessor {
 	@Accessor
 	void setCategory(String category);
 	@Accessor
+	void setPressed(boolean pressed);
+	@Accessor
 	int getTimesPressed();
 	@Accessor
 	void setTimesPressed(int timesPressed);
