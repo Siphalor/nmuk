@@ -38,15 +38,15 @@ dependencies {
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	modImplementation("de.siphalor:amecsapi-${project.minecraft_major_version}:1.1+") {
+	modImplementation("de.siphalor:amecsapi-${project.minecraft_major_version}:1.1.4+mc21w16a") {
 		exclude group: "net.fabricmc.fabric-api"
 		exclude module: "nmuk-${project.minecraft_major_version}"
 	}
 
 	def fabric_deps = [
-			"fabric-api-base"          : "0.2.0+daa38b3d7d",
-			"fabric-key-binding-api-v1": "1.0.2+ca58154a7d",
-			"fabric-resource-loader-v0": "0.4.2+ca58154a7d"
+			"fabric-api-base"          : "0.2.2+23b3c92e27",
+			"fabric-key-binding-api-v1": "1.0.4+524a2e8527",
+			"fabric-resource-loader-v0": "0.4.6+12865e7827"
 	]
 	for (dep in fabric_deps.entrySet()) {
 		modCompile "net.fabricmc.fabric-api:" + dep.getKey() + ":" + dep.getValue()

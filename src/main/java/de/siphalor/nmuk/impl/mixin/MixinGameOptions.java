@@ -29,6 +29,7 @@ import net.minecraft.client.util.InputUtil;
 import org.apache.logging.log4j.Level;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Coerce;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
@@ -54,7 +55,7 @@ public class MixinGameOptions {
 
 	// Prevent nmuk keybindings from getting saved to the Vanilla options file
 	@Inject(
-			method = "write",
+			method = "accept",
 			at = @At(value = "FIELD", target = "Lnet/minecraft/client/option/GameOptions;keysAll:[Lnet/minecraft/client/option/KeyBinding;")
 	)
 	public void removeNMUKBindings(CallbackInfo ci) {
@@ -63,7 +64,7 @@ public class MixinGameOptions {
 	}
 
 	@Inject(
-			method = "write",
+			method = "accept",
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/sound/SoundCategory;values()[Lnet/minecraft/sound/SoundCategory;")
 	)
 	public void resetAllKeys(CallbackInfo ci) {
