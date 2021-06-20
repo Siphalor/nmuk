@@ -114,7 +114,6 @@ public abstract class MixinKeyBinding implements IKeyBinding {
 		if (parent == null) {
 			return 0;
 		}
-		//noinspection RedundantCast
 		return ((IKeyBinding) parent).nmuk_getAlternatives().indexOf((KeyBinding) (Object) this);
 	}
 

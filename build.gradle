@@ -1,13 +1,13 @@
 plugins {
-	id 'fabric-loom' version '0.6-SNAPSHOT'
+	id 'fabric-loom' version '0.8-SNAPSHOT'
 	id 'maven-publish'
 	id 'com.matthewprenger.cursegradle' version '1.4.0'
 	id 'com.modrinth.minotaur' version '1.1.0'
-	id 'org.cadixdev.licenser' version '0.5.0'
+	id 'org.cadixdev.licenser' version '0.6.1'
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_16
 
 archivesBaseName = project.archives_base_name
 version = "${project.mod_version}+mc${project.minecraft_version}"
@@ -24,7 +24,6 @@ minecraft {
 }
 
 repositories {
-	jcenter()
 	maven {
 		name "Siphalor's Maven"
 		url "https://maven.siphalor.de"
@@ -44,16 +43,16 @@ dependencies {
 	}
 
 	def fabric_deps = [
-			"fabric-api-base"          : "0.2.2+23b3c92e27",
-			"fabric-key-binding-api-v1": "1.0.4+524a2e8527",
-			"fabric-resource-loader-v0": "0.4.6+12865e7827"
+			"fabric-api-base"          : "0.3.0+a02b44633d",
+			"fabric-key-binding-api-v1": "1.0.4+a02b44633d",
+			"fabric-resource-loader-v0": "0.4.7+b7ab61213d"
 	]
 	for (dep in fabric_deps.entrySet()) {
-		modCompile "net.fabricmc.fabric-api:" + dep.getKey() + ":" + dep.getValue()
+		modApi "net.fabricmc.fabric-api:" + dep.getKey() + ":" + dep.getValue()
 		include "net.fabricmc.fabric-api:" + dep.getKey() + ":" + dep.getValue()
 	}
 
-	testmodCompile sourceSets.main.output
+	testmodImplementation sourceSets.main.output
 }
 
 license {
@@ -63,15 +62,14 @@ license {
 }
 
 processResources {
-	inputs.property "version", project.version
+	inputs.property "version", version
 
-	from(sourceSets.main.resources.srcDirs) {
-		include "fabric.mod.json"
-		expand "version": project.version
-	}
-
-	from(sourceSets.main.resources.srcDirs) {
-		exclude "fabric.mod.json"
+	afterEvaluate {
+		from(sourceSets.main.resources.srcDirs) {
+			include "fabric.mod.json"
+			expand "version": version
+			duplicatesStrategy DuplicatesStrategy.INCLUDE
+		}
 	}
 }
 
