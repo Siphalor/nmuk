@@ -155,16 +155,14 @@ if (project.hasProperty("siphalorCurseForgeApi")) {
 			releaseType = project.mod_release
 			changelogType = "markdown"
 			changelog = changes
+			addGameVersion("Fabric")
 			/*for (version in ((String) project.mod_mc_versions).split(";")) {
 				addGameVersion(version)
 			}*/
 			addGameVersion("1.17")
 			relations {
 				embeddedLibrary "fabric-api"
-				embeddedLibrary "amecs"
-				embeddedLibrary "cloth-config"
-				embeddedLibrary "tweed-api"
-				optionalDependency "modmenu"
+				optionalDependency "amecs"
 			}
 			mainArtifact(remapJar) {
 				displayName = "[${project.mod_mc_version_specifier}] ${project.mod_version}"
