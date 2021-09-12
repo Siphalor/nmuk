@@ -17,15 +17,14 @@
 
 package de.siphalor.nmuk.impl.mixin;
 
-import java.util.List;
-
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-import net.minecraft.client.gui.widget.EntryListWidget;
+import net.minecraft.client.gui.screen.option.ControlsListWidget;
+import net.minecraft.client.gui.screen.option.ControlsOptionsScreen;
 
-@Mixin(EntryListWidget.class)
-public interface EntryListWidgetAccessor {
+@Mixin(ControlsListWidget.class)
+public interface ControlsListWidgetAccessor {
 	@Accessor
-	List<EntryListWidget.Entry<?>> getChildren();
+	ControlsOptionsScreen getParent();
 }

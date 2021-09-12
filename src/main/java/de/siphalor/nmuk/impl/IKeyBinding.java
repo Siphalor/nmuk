@@ -17,16 +17,17 @@
 
 package de.siphalor.nmuk.impl;
 
-import net.minecraft.client.option.KeyBinding;
+import java.util.List;
+
 import org.jetbrains.annotations.ApiStatus;
 
-import java.util.List;
+import net.minecraft.client.option.KeyBinding;
 
 @ApiStatus.Internal
 public interface IKeyBinding {
-	short nmuk_getNextChildId();
+	int nmuk_getNextChildId();
 
-	void nmuk_setNextChildId(short nextChildId);
+	void nmuk_setNextChildId(int nextChildId);
 
 	boolean nmuk_isAlternative();
 

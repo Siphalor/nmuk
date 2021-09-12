@@ -17,11 +17,9 @@
 
 package de.siphalor.nmuk.impl.mixin;
 
-import de.siphalor.nmuk.impl.IKeyBinding;
-import de.siphalor.nmuk.impl.NMUKKeyBindingHelper;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.InputUtil;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -33,9 +31,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import de.siphalor.nmuk.impl.AlternativeKeyBinding;
+import de.siphalor.nmuk.impl.IKeyBinding;
+import de.siphalor.nmuk.impl.NMUKKeyBindingHelper;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.InputUtil;
 
 @Mixin(value = KeyBinding.class, priority = 800)
 public abstract class MixinKeyBinding implements IKeyBinding {
@@ -51,17 +52,17 @@ public abstract class MixinKeyBinding implements IKeyBinding {
 	@Unique
 	private List<KeyBinding> children = null;
 	@Unique
-	short nextChildId = 0;
+	private int nextChildId = 0;
 	@Unique
 	private KeyBinding parent = null;
 
 	@Override
-	public short nmuk_getNextChildId() {
+	public int nmuk_getNextChildId() {
 		return nextChildId++;
 	}
 
 	@Override
-	public void nmuk_setNextChildId(short nextChildId) {
+	public void nmuk_setNextChildId(int nextChildId) {
 		this.nextChildId = nextChildId;
 	}
 
@@ -98,6 +99,12 @@ public abstract class MixinKeyBinding implements IKeyBinding {
 	public void nmuk_removeAlternative(KeyBinding binding) {
 		if (children != null) {
 			children.remove(binding);
+			if (binding instanceof AlternativeKeyBinding) {
+				int bindingAltId = ((AlternativeKeyBinding) binding).getAlternativeId();
+				if ((nextChildId - 1) == bindingAltId) {
+					nextChildId--;
+				}
+			}
 		}
 	}
 
@@ -114,15 +121,10 @@ public abstract class MixinKeyBinding implements IKeyBinding {
 		if (parent == null) {
 			return 0;
 		}
-		return ((IKeyBinding) parent).nmuk_getAlternatives().indexOf((KeyBinding) (Object) this);
+		return ((IKeyBinding) parent).nmuk_getAlternatives().indexOf(this);
 	}
 
-	@Inject(
-			method = "onKeyPressed",
-			at = @At(value = "FIELD", target = "Lnet/minecraft/client/option/KeyBinding;timesPressed:I"),
-			cancellable = true,
-			locals = LocalCapture.CAPTURE_FAILSOFT
-	)
+	@Inject(method = "onKeyPressed", at = @At(value = "FIELD", target = "Lnet/minecraft/client/option/KeyBinding;timesPressed:I"), cancellable = true, locals = LocalCapture.CAPTURE_FAILSOFT)
 	private static void onKeyPressed(InputUtil.Key key, CallbackInfo callbackInfo, KeyBinding binding) {
 		KeyBinding parent = ((IKeyBinding) binding).nmuk_getParent();
 		if (parent != null) {
@@ -131,11 +133,7 @@ public abstract class MixinKeyBinding implements IKeyBinding {
 		}
 	}
 
-	@Inject(
-			method = "isPressed",
-			at = @At("RETURN"),
-			cancellable = true
-	)
+	@Inject(method = "isPressed", at = @At("RETURN"), cancellable = true)
 	public void isPressedInjection(CallbackInfoReturnable<Boolean> cir) {
 		if (!pressed && children != null && !children.isEmpty()) {
 			for (KeyBinding child : children) {
@@ -146,10 +144,7 @@ public abstract class MixinKeyBinding implements IKeyBinding {
 		}
 	}
 
-	@Inject(
-			method = "reset",
-			at = @At("RETURN")
-	)
+	@Inject(method = "reset", at = @At("RETURN"))
 	private void resetInjection(CallbackInfo callbackInfo) {
 		if (children != null && !children.isEmpty()) {
 			for (KeyBinding child : children) {
@@ -158,11 +153,7 @@ public abstract class MixinKeyBinding implements IKeyBinding {
 		}
 	}
 
-	@Inject(
-			method = "compareTo",
-			at = @At("HEAD"),
-			cancellable = true
-	)
+	@Inject(method = "compareTo", at = @At("HEAD"), cancellable = true)
 	public void compareToInjection(KeyBinding other, CallbackInfoReturnable<Integer> cir) {
 		if (parent != null) {
 			if (other == parent) {
@@ -173,72 +164,41 @@ public abstract class MixinKeyBinding implements IKeyBinding {
 					cir.setReturnValue(Integer.compare(nmuk_getIndexInParent(), ((IKeyBinding) other).nmuk_getIndexInParent()));
 				} else {
 					cir.setReturnValue(
-							I18n.translate(StringUtils.substringBeforeLast(translationKey, "%"))
-									.compareTo(I18n.translate(StringUtils.substringBeforeLast(other.getTranslationKey(), "%")))
-					);
+						I18n.translate(StringUtils.substringBeforeLast(translationKey, "%"))
+							.compareTo(I18n.translate(StringUtils.substringBeforeLast(other.getTranslationKey(), "%"))));
 				}
 			}
 		}
 	}
 
-	@Inject(
-			method = "matchesKey",
-			at = @At("HEAD"),
-			cancellable = true
-	)
+	@Inject(method = "matchesKey", at = @At("HEAD"), cancellable = true)
 	public void matchesKeyInjection(int keyCode, int scanCode, CallbackInfoReturnable<Boolean> cir) {
 		if (children != null && !children.isEmpty()) {
 			for (KeyBinding child : children) {
 				if (child.matchesKey(keyCode, scanCode)) {
 					cir.setReturnValue(true);
+					return;
 				}
 			}
 		}
 	}
 
-	@Inject(
-			method = "matchesMouse",
-			at = @At("HEAD"),
-			cancellable = true
-	)
+	@Inject(method = "matchesMouse", at = @At("HEAD"), cancellable = true)
 	public void matchesMouseInjection(int code, CallbackInfoReturnable<Boolean> cir) {
 		if (children != null && !children.isEmpty()) {
 			for (KeyBinding child : children) {
 				if (child.matchesMouse(code)) {
 					cir.setReturnValue(true);
+					return;
 				}
 			}
 		}
 	}
 
-	@Inject(
-			method = "isDefault",
-			at = @At("RETURN"),
-			cancellable = true
-	)
-	public void isDefaultInjection(CallbackInfoReturnable<Boolean> cir) {
-		if (parent == null) {
-			Collection<KeyBinding> defaults = NMUKKeyBindingHelper.defaultAlternatives.get((KeyBinding) (Object) this);
-			if (defaults.isEmpty()) {
-				if (children != null && !children.isEmpty()) {
-					cir.setReturnValue(false);
-				}
-			} else {
-				if (defaults.size() == children.size()) {
-					for (KeyBinding child : children) {
-						if (!defaults.contains(child)) {
-							cir.setReturnValue(false);
-							return;
-						}
-						if (!child.isDefault()) {
-							cir.setReturnValue(false);
-							return;
-						}
-					}
-				} else {
-					cir.setReturnValue(false);
-				}
-			}
+	@Inject(method = "setBoundKey", at = @At("RETURN"))
+	public void setBoundKeyInjection(InputUtil.Key boundKey, CallbackInfo callbackInfo) {
+		if (nmuk_isAlternative() && boundKey.equals(InputUtil.UNKNOWN_KEY)) {
+			NMUKKeyBindingHelper.removeAlternativeKeyBinding_OptionsScreen((KeyBinding) (Object) this, null, null);
 		}
 	}
 }

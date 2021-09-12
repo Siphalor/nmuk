@@ -17,15 +17,18 @@
 
 package de.siphalor.nmuk.impl.mixin;
 
-import java.util.List;
-
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-import net.minecraft.client.gui.widget.EntryListWidget;
+import net.minecraft.client.gui.screen.option.ControlsListWidget.KeyBindingEntry;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.option.KeyBinding;
 
-@Mixin(EntryListWidget.class)
-public interface EntryListWidgetAccessor {
+@Mixin(KeyBindingEntry.class)
+public interface KeyBindingEntryAccessor {
 	@Accessor
-	List<EntryListWidget.Entry<?>> getChildren();
+	KeyBinding getBinding();
+
+	@Accessor
+	ButtonWidget getEditButton();
 }

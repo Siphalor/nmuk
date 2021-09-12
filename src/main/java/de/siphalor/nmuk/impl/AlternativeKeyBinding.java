@@ -17,27 +17,32 @@
 
 package de.siphalor.nmuk.impl;
 
+import org.jetbrains.annotations.ApiStatus;
+
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
-import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Internal
 public class AlternativeKeyBinding extends KeyBinding {
-	public AlternativeKeyBinding(KeyBinding parent, String translationKey, int code, String category) {
-		super(translationKey, code, category);
+	public static final String ALTERNATIVE_ID_TRANSLATION_KEY_DELIMITER = "%";
+
+	public static String makeAlternativeKeyTranslationKey(String translationKey, int alternativeId) {
+		return translationKey + ALTERNATIVE_ID_TRANSLATION_KEY_DELIMITER + alternativeId;
+	}
+
+	private final int alternativeId;
+
+	public AlternativeKeyBinding(KeyBinding parent, String translationKey, int alternativeId, int code, String category) {
+		this(parent, translationKey, alternativeId, InputUtil.Type.KEYSYM, code, category);
+	}
+
+	public AlternativeKeyBinding(KeyBinding parent, String translationKey, int alternativeId, InputUtil.Type type, int code, String category) {
+		super(makeAlternativeKeyTranslationKey(translationKey, alternativeId), type, code, category);
+		this.alternativeId = alternativeId;
 		((IKeyBinding) this).nmuk_setParent(parent);
 	}
 
-	public AlternativeKeyBinding(KeyBinding parent, String translationKey, InputUtil.Type type, int code, String category) {
-		super(translationKey, type, code, category);
-		((IKeyBinding) this).nmuk_setParent(parent);
-	}
-
-	@Override
-	public boolean isDefault() {
-		if (getDefaultKey() == InputUtil.UNKNOWN_KEY) {
-			return true;
-		}
-		return super.isDefault();
+	public int getAlternativeId() {
+		return alternativeId;
 	}
 }

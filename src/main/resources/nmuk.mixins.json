@@ -2,18 +2,20 @@
 	"required": true,
 	"package": "de.siphalor.nmuk.impl.mixin",
 	"compatibilityLevel": "JAVA_8",
-	"mixins": [
+	"mixins": [],
+	"client": [
 		"ButtonWidgetAccessor",
+		"ControlsListWidgetAccessor",
 		"ControlsOptionsScreenAccessor",
 		"EntryListWidgetAccessor",
 		"GameOptionsAccessor",
 		"KeyBindingAccessor",
+		"KeyBindingEntryAccessor",
 		"KeyBindingRegistryImplAccessor",
 		"MixinGameOptions",
 		"MixinKeyBinding",
 		"MixinKeyBindingEntry"
 	],
-	"client": [],
 	"server": [],
 	"injectors": {
 		"defaultRequire": 1
