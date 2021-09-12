@@ -134,10 +134,8 @@ public class NMUKKeyBindingHelper {
 			return null;
 		}
 		String searchTranslationKey = AlternativeKeyBinding.makeAlternativeKeyTranslationKey(tanslationKey, alternativeId);
-		System.out.println("searching for: " + searchTranslationKey);
 		for (KeyBinding alternative : alternatives) {
 			if (alternative.getTranslationKey().equals(searchTranslationKey)) {
-				System.out.println("found with key" + alternative.getBoundKeyTranslationKey());
 				return alternative;
 			}
 		}
