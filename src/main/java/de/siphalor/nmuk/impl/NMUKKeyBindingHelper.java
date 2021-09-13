@@ -81,34 +81,40 @@ public class NMUKKeyBindingHelper {
 	public static final Multimap<KeyBinding, KeyBinding> defaultAlternatives = Multimaps.newSetMultimap(new HashMap<>(), HashSet::new);
 
 	public static void removeKeyBinding(KeyBinding binding) {
+		// remove it from fabrics moddedKeyBindings list. Or at least try to. Maybe it is not a modded keybinding
 		List<KeyBinding> moddedKeyBindings = KeyBindingRegistryImplAccessor.getModdedKeyBindings();
-		{
-			// noinspection ConstantConditions
-			boolean success = moddedKeyBindings.remove(binding);
-			if (!success) {
-				NMUK.log(Level.ERROR, "Failed to remove modded keybinding!");
-			}
-		}
+		moddedKeyBindings.remove(binding);
 
+		// this removes the keybinding from the options gui
 		changeKeysAll(keysAll -> ArrayUtils.removeElement(keysAll, binding));
+
+		// remove the keybinding from the input query list
+		Map<String, KeyBinding> keyBindings = KeyBindingAccessor.getKeysById();
+		if (!keyBindings.remove(binding.getTranslationKey(), binding)) {
+			NMUK.log(Level.WARN, "Could not remove the keybinding from the internal query list \"keysById\"");
+		}
+		// update keys from ids (this will result in the keybinding no longer being tiggered)
 		KeyBinding.updateKeysByCode();
 	}
 
 	public static void registerKeyBinding(KeyBinding binding) {
-		KeyBindingHelper.registerKeyBinding(binding);
+		KeyBindingHelper.registerKeyBinding(binding); // this adds the keybinding to the moddedKeybindings list and adds the category to the options gui
 		GameOptionsAccessor options = getGameOptionsAccessor();
-		if (options != null) { // Game is during initialization - this is handled by Fapi already
+		if (options != null) { // if options == null: Game is during initialization - this is handled by Fabric Api already
+			// this adds the keybindings to the options gui
 			changeKeysAll(options, keysAll -> ArrayUtils.add(keysAll, binding));
 		}
-		KeyBinding.updateKeysByCode();
 	}
 
 	public static void registerKeyBindings(GameOptions gameOptions, Collection<KeyBinding> bindings) {
 		for (KeyBinding binding : bindings) {
 			KeyBindingHelper.registerKeyBinding(binding);
 		}
-		changeKeysAll((GameOptionsAccessor) gameOptions, keysAll -> ArrayUtils.addAll(keysAll, bindings.toArray(KeyBinding[]::new)));
-		KeyBinding.updateKeysByCode();
+		GameOptionsAccessor options = (GameOptionsAccessor) gameOptions;
+		if (options != null) { // if options == null: Game is during initialization - this is handled by Fabric Api already
+			// this adds the keybindings to the options gui
+			changeKeysAll(options, keysAll -> ArrayUtils.addAll(keysAll, bindings.toArray(KeyBinding[]::new)));
+		}
 	}
 
 	public static void resetSingleKeyBinding(KeyBinding keyBinding) {
