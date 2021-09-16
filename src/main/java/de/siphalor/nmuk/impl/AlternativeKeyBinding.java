@@ -17,7 +17,9 @@
 
 package de.siphalor.nmuk.impl;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.ApiStatus;
+import org.lwjgl.glfw.GLFW;
 
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
@@ -25,12 +27,28 @@ import net.minecraft.client.util.InputUtil;
 @ApiStatus.Internal
 public class AlternativeKeyBinding extends KeyBinding {
 	public static final String ALTERNATIVE_ID_TRANSLATION_KEY_DELIMITER = "%";
+	public static final int NO_ALTERNATIVE_ID = -1;
 
 	public static String makeAlternativeKeyTranslationKey(String translationKey, int alternativeId) {
 		return translationKey + ALTERNATIVE_ID_TRANSLATION_KEY_DELIMITER + alternativeId;
 	}
 
-	private final int alternativeId;
+	public static String getBaseTranslationKey(String translationKey) {
+		return StringUtils.substringBeforeLast(translationKey, ALTERNATIVE_ID_TRANSLATION_KEY_DELIMITER);
+	}
+
+	public static int getAlternativeIdFromTranslationKey(String translationKey) {
+		int stringIndex = translationKey.indexOf(AlternativeKeyBinding.ALTERNATIVE_ID_TRANSLATION_KEY_DELIMITER);
+		if (stringIndex == -1) {
+			// not found
+			return NO_ALTERNATIVE_ID;
+		}
+		return Integer.parseInt(translationKey.substring(stringIndex + AlternativeKeyBinding.ALTERNATIVE_ID_TRANSLATION_KEY_DELIMITER.length()));
+	}
+
+	public AlternativeKeyBinding(KeyBinding parent, String translationKey, int alternativeId, String category) {
+		this(parent, translationKey, alternativeId, InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, category);
+	}
 
 	public AlternativeKeyBinding(KeyBinding parent, String translationKey, int alternativeId, int code, String category) {
 		this(parent, translationKey, alternativeId, InputUtil.Type.KEYSYM, code, category);
@@ -38,11 +56,7 @@ public class AlternativeKeyBinding extends KeyBinding {
 
 	public AlternativeKeyBinding(KeyBinding parent, String translationKey, int alternativeId, InputUtil.Type type, int code, String category) {
 		super(makeAlternativeKeyTranslationKey(translationKey, alternativeId), type, code, category);
-		this.alternativeId = alternativeId;
+		((IKeyBinding) this).nmuk_setAlternativeId(alternativeId);
 		((IKeyBinding) this).nmuk_setParent(parent);
-	}
-
-	public int getAlternativeId() {
-		return alternativeId;
 	}
 }

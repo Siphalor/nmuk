@@ -20,7 +20,6 @@ package de.siphalor.nmuk.impl.mixin;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -54,6 +53,8 @@ public abstract class MixinKeyBinding implements IKeyBinding {
 	@Unique
 	private int nextChildId = 0;
 	@Unique
+	private int alternativeId = AlternativeKeyBinding.NO_ALTERNATIVE_ID;
+	@Unique
 	private KeyBinding parent = null;
 
 	@Override
@@ -68,7 +69,7 @@ public abstract class MixinKeyBinding implements IKeyBinding {
 
 	@Override
 	public boolean nmuk_isAlternative() {
-		return parent != null;
+		return parent != null; // at this point following should be the excat same: alternativeId != AlternativeKeyBinding.NO_ALTERNATIVE_ID
 	}
 
 	@Override
@@ -96,16 +97,23 @@ public abstract class MixinKeyBinding implements IKeyBinding {
 	}
 
 	@Override
-	public void nmuk_removeAlternative(KeyBinding binding) {
+	public int nmuk_removeAlternative(KeyBinding binding) {
 		if (children != null) {
-			children.remove(binding);
-			if (binding instanceof AlternativeKeyBinding) {
-				int bindingAltId = ((AlternativeKeyBinding) binding).getAlternativeId();
+			int index = children.indexOf(binding);
+			if (index == -1) {
+				return -1;
+			}
+			children.remove(index);
+
+			int bindingAltId = ((IKeyBinding) binding).nmuk_getAlternativeId();
+			if (bindingAltId != AlternativeKeyBinding.NO_ALTERNATIVE_ID) {
 				if ((nextChildId - 1) == bindingAltId) {
 					nextChildId--;
 				}
 			}
+			return index;
 		}
+		return -1;
 	}
 
 	@Override
@@ -122,6 +130,16 @@ public abstract class MixinKeyBinding implements IKeyBinding {
 			return 0;
 		}
 		return ((IKeyBinding) parent).nmuk_getAlternatives().indexOf(this);
+	}
+
+	@Override
+	public int nmuk_getAlternativeId() {
+		return alternativeId;
+	}
+
+	@Override
+	public void nmuk_setAlternativeId(int alternativeId) {
+		this.alternativeId = alternativeId;
 	}
 
 	@Inject(method = "onKeyPressed", at = @At(value = "FIELD", target = "Lnet/minecraft/client/option/KeyBinding;timesPressed:I"), cancellable = true, locals = LocalCapture.CAPTURE_FAILSOFT)
@@ -161,11 +179,11 @@ public abstract class MixinKeyBinding implements IKeyBinding {
 			} else if (category.equals(other.getCategory())) {
 				KeyBinding otherParent = ((IKeyBinding) other).nmuk_getParent();
 				if (otherParent == parent) {
-					cir.setReturnValue(Integer.compare(nmuk_getIndexInParent(), ((IKeyBinding) other).nmuk_getIndexInParent()));
+					cir.setReturnValue(Integer.compare(nmuk_getAlternativeId(), ((IKeyBinding) other).nmuk_getAlternativeId()));
 				} else {
 					cir.setReturnValue(
-						I18n.translate(StringUtils.substringBeforeLast(translationKey, "%"))
-							.compareTo(I18n.translate(StringUtils.substringBeforeLast(other.getTranslationKey(), "%"))));
+						I18n.translate(AlternativeKeyBinding.getBaseTranslationKey(translationKey))
+							.compareTo(I18n.translate(AlternativeKeyBinding.getBaseTranslationKey(other.getTranslationKey()))));
 				}
 			}
 		}

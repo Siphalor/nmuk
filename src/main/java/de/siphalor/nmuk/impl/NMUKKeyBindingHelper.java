@@ -20,6 +20,7 @@ package de.siphalor.nmuk.impl;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -27,7 +28,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.Level;
 import org.jetbrains.annotations.ApiStatus;
 
-import com.google.common.collect.Multimap;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimaps;
 
 import de.siphalor.nmuk.NMUK;
@@ -42,6 +43,7 @@ import net.minecraft.client.gui.widget.EntryListWidget.Entry;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.client.util.InputUtil.Key;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
@@ -78,26 +80,10 @@ public class NMUKKeyBindingHelper {
 		return (GameOptionsAccessor) MinecraftClient.getInstance().options;
 	}
 
-	public static final Multimap<KeyBinding, KeyBinding> defaultAlternatives = Multimaps.newSetMultimap(new HashMap<>(), HashSet::new);
+	public static final ListMultimap<KeyBinding, KeyBinding> defaultAlternatives = Multimaps.newListMultimap(new HashMap<>(), ArrayList::new);
 
-	public static void removeKeyBinding(KeyBinding binding) {
-		// remove it from fabrics moddedKeyBindings list. Or at least try to. Maybe it is not a modded keybinding
-		List<KeyBinding> moddedKeyBindings = KeyBindingRegistryImplAccessor.getModdedKeyBindings();
-		moddedKeyBindings.remove(binding);
-
-		// this removes the keybinding from the options gui
-		changeKeysAll(keysAll -> ArrayUtils.removeElement(keysAll, binding));
-
-		// remove the keybinding from the input query list
-		Map<String, KeyBinding> keyBindings = KeyBindingAccessor.getKeysById();
-		if (!keyBindings.remove(binding.getTranslationKey(), binding)) {
-			NMUK.log(Level.WARN, "Could not remove the keybinding from the internal query list \"keysById\"");
-		}
-		// update keys from ids (this will result in the keybinding no longer being tiggered)
-		KeyBinding.updateKeysByCode();
-	}
-
-	public static void registerKeyBinding(KeyBinding binding) {
+	// register/unregister keybindings
+	public static void registerKeyBindingGUI(KeyBinding binding) {
 		KeyBindingHelper.registerKeyBinding(binding); // this adds the keybinding to the moddedKeybindings list and adds the category to the options gui
 		GameOptionsAccessor options = getGameOptionsAccessor();
 		if (options != null) { // if options == null: Game is during initialization - this is handled by Fabric Api already
@@ -106,9 +92,43 @@ public class NMUKKeyBindingHelper {
 		}
 	}
 
-	public static void registerKeyBindings(GameOptions gameOptions, Collection<KeyBinding> bindings) {
+	public static void unregisterKeyBindingGUI(KeyBinding binding) {
+		removeKeyBindingGUI(getGameOptionsAccessor(), binding);
+	}
+
+	public static void removeKeyBindingGUI(GameOptionsAccessor options, KeyBinding binding) {
+		// remove it from fabrics moddedKeyBindings list. Or at least try to. Maybe it is not a modded keybinding
+		List<KeyBinding> moddedKeyBindings = KeyBindingRegistryImplAccessor.getModdedKeyBindings();
+		moddedKeyBindings.remove(binding);
+
+		if (options != null) { // if options == null: Game is during initialization - this is handled by Fabric Api already
+			// this removes the keybinding from the options gui
+			changeKeysAll(options, keysAll -> ArrayUtils.removeElement(keysAll, binding));
+		}
+	}
+
+	private static void changeKeysById(Consumer<Map<String, KeyBinding>> changeFunction) {
+		// get the keybinding from the input query list
+		Map<String, KeyBinding> keyBindings = KeyBindingAccessor.getKeysById();
+		changeFunction.accept(keyBindings);
+		// update keys from ids (this will result in the keybinding from now on/no longer being tiggered)
+		KeyBinding.updateKeysByCode();
+	}
+
+	public static void registerKeyBindingQuerying(KeyBinding binding) {
+		// TODO: use methods from amecs??
+		changeKeysById(keyBindings -> keyBindings.put(binding.getTranslationKey(), binding));
+	}
+
+	public static void unregisterKeyBindingQuerying(KeyBinding binding) {
+		// TODO: use methods from amecs??
+		changeKeysById(keyBindings -> keyBindings.remove(binding.getTranslationKey(), binding));
+	}
+
+	public static void registerKeyBindingsBoth(GameOptions gameOptions, Collection<KeyBinding> bindings) {
 		for (KeyBinding binding : bindings) {
 			KeyBindingHelper.registerKeyBinding(binding);
+			registerKeyBindingQuerying(binding);
 		}
 		GameOptionsAccessor options = (GameOptionsAccessor) gameOptions;
 		if (options != null) { // if options == null: Game is during initialization - this is handled by Fabric Api already
@@ -116,25 +136,20 @@ public class NMUKKeyBindingHelper {
 			changeKeysAll(options, keysAll -> ArrayUtils.addAll(keysAll, bindings.toArray(KeyBinding[]::new)));
 		}
 	}
+	// - register/unregister keybindings
 
 	public static void resetSingleKeyBinding(KeyBinding keyBinding) {
 		keyBinding.setBoundKey(keyBinding.getDefaultKey());
 	}
 
-	public static KeyBinding createAlternativeKeyBinding(KeyBinding base) {
-		return createAlternativeKeyBinding(base, -1);
-	}
-
-	public static KeyBinding createAlternativeKeyBinding(KeyBinding base, int code) {
-		return createAlternativeKeyBinding(base, InputUtil.Type.KEYSYM, code);
-	}
-
+	// used in GameOptions.load
 	public static KeyBinding findMatchingAlternativeInBase(KeyBinding base, int alternativeId) {
 		IKeyBinding parent = (IKeyBinding) base;
 		List<KeyBinding> alternatives = parent.nmuk_getAlternatives();
 		return findMatchingAlternative(alternatives, base.getTranslationKey(), alternativeId);
 	}
 
+	// used in GameOptions.load
 	public static KeyBinding findMatchingAlternative(List<KeyBinding> alternatives, String tanslationKey, int alternativeId) {
 		if (alternatives == null) {
 			return null;
@@ -148,11 +163,71 @@ public class NMUKKeyBindingHelper {
 		return null;
 	}
 
-	public static KeyBinding createAlternativeKeyBinding(KeyBinding base, InputUtil.Type type, int code) {
+	/**
+	 *
+	 * @param base
+	 * @return the keybinding (get or new). It is registered for input querying and is added to the parent
+	 */
+	public static KeyBinding getOrCreateAlternativeKeyBinding(KeyBinding base) {
 		IKeyBinding parent = (IKeyBinding) base;
-		KeyBinding alt = new AlternativeKeyBinding(base, base.getTranslationKey(), parent.nmuk_getNextChildId(), type, code, base.getCategory());
-		parent.nmuk_addAlternative(alt);
-		return alt;
+
+		// get the next default alternative if available
+		List<KeyBinding> defaultAlternatives = NMUKKeyBindingHelper.defaultAlternatives.get(base);
+		if (defaultAlternatives.size() > parent.nmuk_getAlternativesCount()) {
+			KeyBinding defaultAlternative = defaultAlternatives.get(parent.nmuk_getAlternativesCount());
+			makeKeyBindingAlternativeOf(base, defaultAlternative, AlternativeKeyBinding.NO_ALTERNATIVE_ID, false);
+			registerKeyBindingQuerying(defaultAlternative);
+
+			parent.nmuk_addAlternative(defaultAlternative);
+			return defaultAlternative;
+		}
+
+		// if not we create a new alternative keybinding
+		KeyBinding alternative = new AlternativeKeyBinding(base, base.getTranslationKey(), parent.nmuk_getNextChildId(), base.getCategory());
+		parent.nmuk_addAlternative(alternative);
+		return alternative;
+	}
+
+	/**
+	 *
+	 * @param base
+	 * @param type
+	 * @param code
+	 * @return the newly created keybinding. It is registered for input querying
+	 */
+	public static KeyBinding createAndAddAlternativeKeyBinding(KeyBinding base, InputUtil.Type type, int code) {
+		IKeyBinding parent = (IKeyBinding) base;
+		KeyBinding alternative = new AlternativeKeyBinding(base, base.getTranslationKey(), parent.nmuk_getNextChildId(), type, code, base.getCategory());
+		parent.nmuk_addAlternative(alternative);
+		return alternative;
+	}
+
+	/**
+	 * The keybinding {@code alternative} is NEITHER registered for querying NOR in the gui
+	 *
+	 * @param base
+	 * @param alternative
+	 * @param alternativeId
+	 * @param addToBase
+	 */
+	public static void makeKeyBindingAlternativeOf(KeyBinding base, KeyBinding alternative, int alternativeId, boolean addToBase) {
+		IKeyBinding parent = (IKeyBinding) base;
+
+		// now the keybinding is a complete ghost and we can give it a new identity
+		// this code here should set all the values in the same way than the AlternativeKeyBinding contructor does
+		if (alternativeId == AlternativeKeyBinding.NO_ALTERNATIVE_ID) {
+			alternativeId = parent.nmuk_getNextChildId();
+		}
+		String newTranslationKey = AlternativeKeyBinding.makeAlternativeKeyTranslationKey(base.getTranslationKey(), alternativeId);
+		((KeyBindingAccessor) alternative).setTranslationKey(newTranslationKey);
+		((KeyBindingAccessor) alternative).setCategory(base.getCategory());
+		((IKeyBinding) alternative).nmuk_setAlternativeId(alternativeId);
+		((IKeyBinding) alternative).nmuk_setParent(base);
+
+		if (addToBase) {
+			// and finally we give the parent its new child
+			parent.nmuk_addAlternative(alternative);
+		}
 	}
 
 	// for options gui
@@ -205,13 +280,57 @@ public class NMUKKeyBindingHelper {
 			}
 		}
 
-		((IKeyBinding) ((IKeyBinding) keyBinding).nmuk_getParent()).nmuk_removeAlternative(keyBinding);
-		removeKeyBinding(keyBinding);
-		// do it like vanilla and save directly
-		saveOptions();
+		KeyBinding base = ((IKeyBinding) keyBinding).nmuk_getParent();
+		int indexInBase = ((IKeyBinding) base).nmuk_removeAlternative(keyBinding);
+		unregisterKeyBindingQuerying(keyBinding);
+		unregisterKeyBindingGUI(keyBinding);
 
 		List<Entry<?>> entries = getControlsListWidgetEntries(listWidget);
-		entries.remove(entry);
+		int indexInEntries = entries.indexOf(entry);
+		entries.remove(indexInEntries);
+		updateDefaultAlternativesInBase(base, indexInBase, listWidget, entries, indexInEntries);
+
+		// do it like vanilla and save directly
+		saveOptions();
+	}
+
+	private static void updateDefaultAlternativesInBase(KeyBinding base, int indexInBase, ControlsListWidget listWidget, List<Entry<?>> entries, int indexInEntries) {
+		if (indexInBase == -1) {
+			// not removed: nothing changed and maybe even the list is empty
+			return;
+		}
+		List<KeyBinding> defaultAlternatives = NMUKKeyBindingHelper.defaultAlternatives.get(base);
+		if (indexInBase >= defaultAlternatives.size()) {
+			// the removed keybinding was after all the default ones
+			return;
+		}
+		// update the defaults
+		List<KeyBinding> alternatives = ((IKeyBinding) base).nmuk_getAlternatives();
+		int minSize = Math.min(alternatives.size(), defaultAlternatives.size());
+		for (int i = indexInBase; i < minSize; i++) {
+			KeyBinding currentAlt = alternatives.get(i);
+			KeyBinding newAlt = defaultAlternatives.get(i);
+			if (currentAlt == newAlt) {
+				continue;
+			}
+			Key boundKey = ((KeyBindingAccessor) currentAlt).getBoundKey();
+			makeKeyBindingAlternativeOf(base, newAlt, ((IKeyBinding) currentAlt).nmuk_getAlternativeId(), false);
+			newAlt.setBoundKey(boundKey);
+			// important to first unregister the current one before registering the new one
+			unregisterKeyBindingQuerying(currentAlt);
+			unregisterKeyBindingGUI(currentAlt);
+
+			registerKeyBindingQuerying(newAlt);
+			registerKeyBindingGUI(newAlt);
+			alternatives.set(i, newAlt);
+
+			// update gui entries
+			int iRelToStart = (i - indexInBase);
+			int indexEntry = indexInEntries + iRelToStart;
+			entries.remove(indexEntry);
+			ControlsListWidget.KeyBindingEntry newEntry = createKeyBindingEntry(listWidget, newAlt, ENTRY_NAME);
+			entries.add(indexEntry, newEntry);
+		}
 	}
 
 	private static int getExistingKeyIsUnboundIndex(KeyBinding binding) {
@@ -248,8 +367,8 @@ public class NMUKKeyBindingHelper {
 			return null;
 		}
 
-		KeyBinding altBinding = createAlternativeKeyBinding(baseKeyBinding);
-		registerKeyBinding(altBinding);
+		KeyBinding altBinding = getOrCreateAlternativeKeyBinding(baseKeyBinding);
+		registerKeyBindingGUI(altBinding);
 		ControlsListWidget.KeyBindingEntry altEntry = createKeyBindingEntry(listWidget, altBinding, DEFAULT_KEYBINDING_ENTRY_TEXT);
 		if (altEntry != null) {
 			List<Entry<?>> entries = getControlsListWidgetEntries(listWidget);
@@ -267,34 +386,44 @@ public class NMUKKeyBindingHelper {
 
 	public static void resetAlternativeKeyBindings_OptionsScreen(KeyBinding baseKeyBinding, ControlsListWidget listWidget, ControlsListWidget.KeyBindingEntry entry) {
 		List<KeyBinding> alternatives = ((IKeyBinding) baseKeyBinding).nmuk_getAlternatives();
+		// we make a copy of the defaultAlternatives here because we remove some elements for calculation
 		List<KeyBinding> defaultAlternatives = new ArrayList<>(NMUKKeyBindingHelper.defaultAlternatives.get(baseKeyBinding));
 		List<Entry<?>> entries = getControlsListWidgetEntries(listWidget);
-		int entryPos = entries.indexOf(entry);
+		int childrenStartEntryPos = entries.indexOf(entry) + 1;
 
+		int alternativesSize = alternatives.size();
 		boolean changed = false;
-		int index;
-		for (Iterator<KeyBinding> iterator = alternatives.iterator(); iterator.hasNext();) {
+		Iterator<KeyBinding> iterator = alternatives.iterator();
+		while (iterator.hasNext()) {
 			KeyBinding alternative = iterator.next();
-			index = defaultAlternatives.indexOf(alternative);
-			if (index == -1) {
-				entries.remove(entryPos + 1 + ((IKeyBinding) alternative).nmuk_getIndexInParent());
+			if (!defaultAlternatives.contains(alternative)) {
+				// if alternative is not a default alternative
+				// unregister it
+				unregisterKeyBindingQuerying(alternative);
+				unregisterKeyBindingGUI(alternative);
 				iterator.remove();
-				removeKeyBinding(alternative);
-			} else {
-				defaultAlternatives.remove(index);
-				resetSingleKeyBinding(alternative);
+				changed = true;
 			}
-			changed = true;
 		}
-		entryPos += alternatives.size();
+		// alternatives now only contains the default alternatives we already knew
+		List<KeyBinding> defaultAlternativesAlreadyKnown = new ArrayList<>(alternatives);
 
-		registerKeyBindings(MinecraftClient.getInstance().options, defaultAlternatives);
+		// remove all entries from gui
+		entries.subList(childrenStartEntryPos, childrenStartEntryPos + alternativesSize).clear();
+		// clear alternatives of base
+		alternatives.clear();
+
 		for (KeyBinding defaultAlternative : defaultAlternatives) {
 			ControlsListWidget.KeyBindingEntry newEntry = createKeyBindingEntry(listWidget, defaultAlternative, ENTRY_NAME);
-			entries.add(++entryPos, newEntry);
+			entries.add(childrenStartEntryPos++, newEntry);
 			resetSingleKeyBinding(defaultAlternative);
+			alternatives.add(defaultAlternative);
 			changed = true;
 		}
+
+		defaultAlternatives.removeAll(defaultAlternativesAlreadyKnown);
+		registerKeyBindingsBoth(MinecraftClient.getInstance().options, defaultAlternatives);
+
 		if (changed) {
 			// do it like vanilla and save directly
 			saveOptions();
@@ -315,4 +444,5 @@ public class NMUKKeyBindingHelper {
 		}
 		return null;
 	}
+
 }

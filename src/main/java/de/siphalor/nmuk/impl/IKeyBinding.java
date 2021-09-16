@@ -39,9 +39,23 @@ public interface IKeyBinding {
 
 	int nmuk_getAlternativesCount();
 
-	void nmuk_removeAlternative(KeyBinding binding);
+	/**
+	 *
+	 * @param binding
+	 * @return the index at which the binding was found in the parent's alternatives
+	 */
+	int nmuk_removeAlternative(KeyBinding binding);
 
 	void nmuk_addAlternative(KeyBinding binding);
 
+	/**
+	 * This method should only be used for the controls gui to determine the entry position
+	 *
+	 * @return the index in the parent's children list
+	 */
 	int nmuk_getIndexInParent();
+
+	int nmuk_getAlternativeId();
+
+	void nmuk_setAlternativeId(int alternativeId);
 }

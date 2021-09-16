@@ -17,13 +17,15 @@
 
 package de.siphalor.nmuk.impl.mixin;
 
-import net.minecraft.client.option.KeyBinding;
+import java.util.Map;
+
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-import java.util.Map;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.util.InputUtil.Key;
 
 @Mixin(KeyBinding.class)
 public interface KeyBindingAccessor {
@@ -47,4 +49,8 @@ public interface KeyBindingAccessor {
 
 	@Accessor
 	void setTimesPressed(int timesPressed);
+
+	@Final
+	@Accessor
+	Key getBoundKey();
 }
