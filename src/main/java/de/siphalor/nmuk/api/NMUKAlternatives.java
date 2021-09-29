@@ -39,8 +39,19 @@ public class NMUKAlternatives {
 	 * @param code The keycode to use as default for the alternative
 	 * @return the new created keybinding
 	 */
-	public static KeyBinding create(KeyBinding base, int code) {
-		return create(base, InputUtil.Type.KEYSYM, code);
+	public static KeyBinding createAndGet(KeyBinding base, int code) {
+		return createAndGet(base, InputUtil.Type.KEYSYM, code);
+	}
+
+	/**
+	 * Create an alternative keybinding with the given code and {@link InputUtil.Type#KEYSYM}.
+	 *
+	 * @param base The base keybinding to create an alternative for
+	 * @param code The keycode to use as default for the alternative
+	 */
+	@Deprecated
+	public static void create(KeyBinding base, int code) {
+		createAndGet(base, code);
 	}
 
 	/**
@@ -51,11 +62,23 @@ public class NMUKAlternatives {
 	 * @param code The input code
 	 * @return the new created keybinding
 	 */
-	public static KeyBinding create(KeyBinding base, InputUtil.Type inputType, int code) {
+	public static KeyBinding createAndGet(KeyBinding base, InputUtil.Type inputType, int code) {
 		KeyBinding alternative = NMUKKeyBindingHelper.createAndAddAlternativeKeyBinding(base, inputType, code);
 		NMUKKeyBindingHelper.defaultAlternatives.put(base, alternative);
 		NMUKKeyBindingHelper.registerKeyBindingGUI(alternative);
 		return alternative;
+	}
+
+	/**
+	 * Create an alternative keybinding with the given code and input type.
+	 *
+	 * @param base The base keybinding to create an alternative for
+	 * @param inputType The {@link InputUtil.Type} that defines the type of the code
+	 * @param code The input code
+	 */
+	@Deprecated
+	public static void create(KeyBinding base, InputUtil.Type inputType, int code) {
+		createAndGet(base, inputType, code);
 	}
 
 	/**
@@ -68,7 +91,7 @@ public class NMUKAlternatives {
 	 * @param alternative The alternative keybinding
 	 * @return the alternative keybinding given
 	 */
-	public static KeyBinding create(KeyBinding base, KeyBinding alternative) {
+	public static <K extends KeyBinding> K createAndGet(KeyBinding base, K alternative) {
 		// unregister the alternative keybinding as it is known until now
 		NMUKKeyBindingHelper.unregisterKeyBindingQuerying(alternative);
 		NMUKKeyBindingHelper.unregisterKeyBindingGUI(alternative);
@@ -79,6 +102,20 @@ public class NMUKAlternatives {
 		NMUKKeyBindingHelper.registerKeyBindingQuerying(alternative);
 		NMUKKeyBindingHelper.registerKeyBindingGUI(alternative);
 		return alternative;
+	}
+
+	/**
+	 * Register and add the latter keybinding to the former.<br />
+	 * This is useful when using more complex keybinding trigger, e.g. in use with Amces.<br />
+	 * The translation key and the category of the alternative keybinding will be rewritten.
+	 * The keybinding might already be registered. In that case it is unregistered and registered again with the new identity.
+	 *
+	 * @param base The base keybinding to create an alternative for
+	 * @param alternative The alternative keybinding
+	 */
+	@Deprecated
+	public static void create(KeyBinding base, KeyBinding alternative) {
+		createAndGet(base, alternative);
 	}
 
 	/**
