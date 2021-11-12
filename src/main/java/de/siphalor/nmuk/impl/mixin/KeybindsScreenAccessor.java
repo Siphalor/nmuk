@@ -18,12 +18,12 @@
 package de.siphalor.nmuk.impl.mixin;
 
 import net.minecraft.client.gui.screen.option.ControlsListWidget;
-import net.minecraft.client.gui.screen.option.ControlsOptionsScreen;
+import net.minecraft.client.gui.screen.option.KeybindsScreen;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(ControlsOptionsScreen.class)
-public interface ControlsOptionsScreenAccessor {
+@Mixin(KeybindsScreen.class)
+public interface KeybindsScreenAccessor {
 	@Accessor
-	ControlsListWidget getKeyBindingListWidget();
+	ControlsListWidget getControlsList();
 }

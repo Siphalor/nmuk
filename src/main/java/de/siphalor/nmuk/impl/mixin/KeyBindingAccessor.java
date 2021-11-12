@@ -27,7 +27,7 @@ import java.util.Map;
 
 @Mixin(KeyBinding.class)
 public interface KeyBindingAccessor {
-	@Accessor
+	@Accessor("KEYS_BY_ID")
 	static Map<String, KeyBinding> getKeysById() {
 		return null;
 	}

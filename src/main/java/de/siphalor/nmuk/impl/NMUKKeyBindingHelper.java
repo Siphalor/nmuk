@@ -20,7 +20,7 @@ package de.siphalor.nmuk.impl;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import de.siphalor.nmuk.NMUK;
-import de.siphalor.nmuk.impl.mixin.ControlsOptionsScreenAccessor;
+import de.siphalor.nmuk.impl.mixin.KeybindsScreenAccessor;
 import de.siphalor.nmuk.impl.mixin.EntryListWidgetAccessor;
 import de.siphalor.nmuk.impl.mixin.GameOptionsAccessor;
 import de.siphalor.nmuk.impl.mixin.KeyBindingRegistryImplAccessor;
@@ -115,10 +115,10 @@ public class NMUKKeyBindingHelper {
 
 	public static List<ControlsListWidget.KeyBindingEntry> getControlsListWidgetEntries() {
 		Screen screen = MinecraftClient.getInstance().currentScreen;
-		if (screen instanceof ControlsOptionsScreenAccessor) {
+		if (screen instanceof KeybindsScreenAccessor) {
 			//noinspection unchecked
 			return (List<ControlsListWidget.KeyBindingEntry>) (Object)
-					((EntryListWidgetAccessor) ((ControlsOptionsScreenAccessor) screen).getKeyBindingListWidget()).getChildren();
+					((EntryListWidgetAccessor) ((KeybindsScreenAccessor) screen).getControlsList()).getChildren();
 		}
 		return null;
 	}
