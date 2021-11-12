@@ -28,6 +28,7 @@ repositories {
 		name "Siphalor's Maven"
 		url "https://maven.siphalor.de"
 	}
+	maven { url "https://jitpack.io" }
 	mavenLocal()
 }
 
@@ -51,6 +52,8 @@ dependencies {
 		modApi "net.fabricmc.fabric-api:" + dep.getKey() + ":" + dep.getValue()
 		include "net.fabricmc.fabric-api:" + dep.getKey() + ":" + dep.getValue()
 	}
+
+	modRuntime("com.github.astei:lazydfu:master-SNAPSHOT")
 
 	testmodImplementation sourceSets.main.output
 }
