@@ -3,7 +3,7 @@ plugins {
 	id 'maven-publish'
 	id 'com.matthewprenger.cursegradle' version '1.4.0'
 	id 'com.modrinth.minotaur' version '1.1.0'
-	id 'org.cadixdev.licenser' version '0.5.0'
+	id 'org.cadixdev.licenser' version '0.6.1'
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8
@@ -24,7 +24,6 @@ minecraft {
 }
 
 repositories {
-	jcenter()
 	maven {
 		name "Siphalor's Maven"
 		url "https://maven.siphalor.de"
@@ -49,11 +48,11 @@ dependencies {
 			"fabric-resource-loader-v0": "0.4.2+ca58154a7d"
 	]
 	for (dep in fabric_deps.entrySet()) {
-		modCompile "net.fabricmc.fabric-api:" + dep.getKey() + ":" + dep.getValue()
+		modApi "net.fabricmc.fabric-api:" + dep.getKey() + ":" + dep.getValue()
 		include "net.fabricmc.fabric-api:" + dep.getKey() + ":" + dep.getValue()
 	}
 
-	testmodCompile sourceSets.main.output
+	testmodImplementation sourceSets.main.output
 }
 
 license {
