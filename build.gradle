@@ -2,7 +2,7 @@ plugins {
 	id 'fabric-loom' version '0.6-SNAPSHOT'
 	id 'maven-publish'
 	id 'com.matthewprenger.cursegradle' version '1.4.0'
-	id 'com.modrinth.minotaur' version '1.1.0'
+	id 'com.modrinth.minotaur' version '2.1.1'
 	id 'org.cadixdev.licenser' version '0.6.1'
 }
 
@@ -147,15 +147,14 @@ task uploadToModSites {
 	group = "upload"
 }
 
-if (project.hasProperty("siphalorCurseForgeApi")) {
+if (project.hasProperty("curseforgeToken")) {
 	curseforge {
-		apiKey project.siphalorCurseForgeApi
-		def changes = getChangelog()
+		apiKey project.curseforgeToken
 		project {
 			id = "438172"
 			releaseType = project.mod_release
 			changelogType = "markdown"
-			changelog = changes
+			changelog = project.getChangelog()
 			addGameVersion("Fabric")
 			for (version in ((String) project.mod_mc_versions).split(";")) {
 				addGameVersion(version)
@@ -172,23 +171,18 @@ if (project.hasProperty("siphalorCurseForgeApi")) {
 	uploadToModSites.finalizedBy(tasks.curseforge)
 }
 
-import com.modrinth.minotaur.TaskModrinthUpload
-if (project.hasProperty("siphalorModrinthApi")) {
-	task modrinth (type: TaskModrinthUpload) {
-		group = "upload"
-		dependsOn(build)
-
-		token = project.siphalorModrinthApi
-		projectId = "YCcdA1Lp"
-		versionNumber = version
-		versionName = "[${project.mod_mc_version_specifier}] ${project.mod_version}"
-		changelog = getChangelog()
-		uploadFile = remapJar
-		releaseType = project.mod_release
-		for (version in ((String) project.mod_mc_versions).split(";")) {
-			addGameVersion(version)
-		}
-		addLoader("fabric")
+modrinth {
+	if (project.hasProperty("modrinthToken")) {
+		token = project.modrinthToken
+		uploadToModSites.finalizedBy(tasks.modrinth)
 	}
-	uploadToModSites.finalizedBy(tasks.modrinth)
+
+	projectId = "YCcdA1Lp"
+	versionName = "[${project.mod_mc_version_specifier}] ${project.mod_version}"
+	versionType = project.mod_release
+	changelog = project.getChangelog()
+	uploadFile = remapJar
+	gameVersions = project.mod_mc_versions.split(";") as List<String>
+	loaders = ["fabric"]
 }
+tasks.modrinth.group = "upload"
