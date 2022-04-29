@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '0.10-SNAPSHOT'
+	id 'fabric-loom' version '0.11-SNAPSHOT'
 	id 'maven-publish'
 	id 'com.matthewprenger.cursegradle' version '1.4.0'
 	id 'com.modrinth.minotaur' version '1.2.1'
@@ -20,9 +20,6 @@ sourceSets {
 	}
 }
 
-minecraft {
-}
-
 repositories {
 	maven {
 		name "Siphalor's Maven"
@@ -38,19 +35,18 @@ dependencies {
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	modImplementation("de.siphalor:amecsapi-${project.minecraft_major_version}:1.3.0+mc1.18-pre1") {
+	modImplementation("de.siphalor:amecsapi-${project.minecraft_major_version}:1.3.6+mc22w17a") {
 		exclude group: "net.fabricmc.fabric-api"
 		exclude module: "nmuk-${project.minecraft_major_version}"
 	}
 
 	def fabric_deps = [
-			"fabric-api-base"          : "0.4.0+65d505fc9c",
-			"fabric-key-binding-api-v1": "1.0.5+65d505fc9c",
-			"fabric-resource-loader-v0": "0.4.9+65d505fc9c"
+			"fabric-api-base",
+			"fabric-key-binding-api-v1",
+			"fabric-resource-loader-v0"
 	]
-	for (dep in fabric_deps.entrySet()) {
-		modApi "net.fabricmc.fabric-api:" + dep.getKey() + ":" + dep.getValue()
-		include "net.fabricmc.fabric-api:" + dep.getKey() + ":" + dep.getValue()
+	for (dep in fabric_deps) {
+		include modApi(fabricApi.module(dep, project.fabric_api_version))
 	}
 
 	modRuntimeOnly("com.github.astei:lazydfu:master-SNAPSHOT")

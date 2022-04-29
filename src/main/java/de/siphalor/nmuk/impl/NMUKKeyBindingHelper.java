@@ -57,12 +57,12 @@ public class NMUKKeyBindingHelper {
 			}
 		}
 		GameOptionsAccessor options = (GameOptionsAccessor) MinecraftClient.getInstance().options;
-		KeyBinding[] keysAll = options.getKeysAll();
+		KeyBinding[] keysAll = options.getAllKeys();
 		int index = ArrayUtils.indexOf(keysAll, binding);
 		KeyBinding[] newKeysAll = new KeyBinding[keysAll.length - 1];
 		System.arraycopy(keysAll, 0, newKeysAll, 0, index);
 		System.arraycopy(keysAll, index + 1, newKeysAll, index, keysAll.length - index - 1);
-		options.setKeysAll(newKeysAll);
+		options.setAllKeys(newKeysAll);
 		KeyBinding.updateKeysByCode();
 	}
 
@@ -70,18 +70,18 @@ public class NMUKKeyBindingHelper {
 		KeyBindingHelper.registerKeyBinding(binding);
 		GameOptionsAccessor options = (GameOptionsAccessor) MinecraftClient.getInstance().options;
 		if (options != null) { // Game is during initialization - this is handled by Fapi already
-			KeyBinding[] keysAll = options.getKeysAll();
+			KeyBinding[] keysAll = options.getAllKeys();
 			KeyBinding[] newKeysAll = new KeyBinding[keysAll.length + 1];
 			System.arraycopy(keysAll, 0, newKeysAll, 0, keysAll.length);
 			newKeysAll[keysAll.length] = binding;
-			options.setKeysAll(newKeysAll);
+			options.setAllKeys(newKeysAll);
 		}
 		KeyBinding.updateKeysByCode();
 	}
 
 	public static void registerKeyBindings(GameOptions gameOptions, Collection<KeyBinding> bindings) {
 		GameOptionsAccessor options = (GameOptionsAccessor) gameOptions;
-		KeyBinding[] keysAll = options.getKeysAll();
+		KeyBinding[] keysAll = options.getAllKeys();
 		KeyBinding[] newKeysAll = new KeyBinding[keysAll.length + bindings.size()];
 		System.arraycopy(keysAll, 0, newKeysAll, 0, keysAll.length);
 		int i = keysAll.length;
@@ -90,7 +90,7 @@ public class NMUKKeyBindingHelper {
 			newKeysAll[i] = binding;
 			i++;
 		}
-		options.setKeysAll(newKeysAll);
+		options.setAllKeys(newKeysAll);
 		KeyBinding.updateKeysByCode();
 	}
 

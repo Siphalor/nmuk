@@ -25,8 +25,8 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(GameOptions.class)
 public interface GameOptionsAccessor {
 	@Accessor
-	KeyBinding[] getKeysAll();
+	KeyBinding[] getAllKeys();
 
 	@Accessor
-	void setKeysAll(KeyBinding[] bindings);
+	void setAllKeys(KeyBinding[] bindings);
 }

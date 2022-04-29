@@ -27,9 +27,7 @@ import net.minecraft.client.gui.screen.option.ControlsListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -43,8 +41,8 @@ import java.util.List;
 
 @Mixin(ControlsListWidget.KeyBindingEntry.class)
 public class MixinKeyBindingEntry {
-	private static final Text ENTRY_NAME = new LiteralText("    ->");
-	private static final Text RESET_TOOLTIP = new TranslatableText("nmuk.options.controls.reset.tooltip");
+	private static final Text ENTRY_NAME = Text.literal("    ->");
+	private static final Text RESET_TOOLTIP = Text.translatable("nmuk.options.controls.reset.tooltip");
 
 	@Shadow
 	@Final
@@ -68,20 +66,19 @@ public class MixinKeyBindingEntry {
 		IKeyBinding iKeyBinding = (IKeyBinding) binding;
 		if (iKeyBinding.nmuk_isAlternative()) {
 			bindingName = ENTRY_NAME;
-			alternativesButton = new ButtonWidget(0, 0, 20, 20, new LiteralText("x"), button -> {
+			alternativesButton = new ButtonWidget(0, 0, 20, 20, Text.literal("x"), button -> {
 				((IKeyBinding) iKeyBinding.nmuk_getParent()).nmuk_removeAlternative(binding);
 				NMUKKeyBindingHelper.removeKeyBinding(binding);
 				List<ControlsListWidget.KeyBindingEntry> entries = NMUKKeyBindingHelper.getControlsListWidgetEntries();
 				if (entries != null) {
-					//noinspection RedundantCast
 					entries.remove((ControlsListWidget.KeyBindingEntry) (Object) this);
 				}
 			});
 		} else {
-			alternativesButton = new ButtonWidget(0, 0, 20, 20, new LiteralText("+"), button -> {
+			alternativesButton = new ButtonWidget(0, 0, 20, 20, Text.literal("+"), button -> {
 				KeyBinding altBinding = NMUKKeyBindingHelper.createAlternativeKeyBinding(binding);
 				NMUKKeyBindingHelper.registerKeyBinding(altBinding);
-				ControlsListWidget.KeyBindingEntry altEntry = NMUKKeyBindingHelper.createKeyBindingEntry(outer, altBinding, new LiteralText("..."));
+				ControlsListWidget.KeyBindingEntry altEntry = NMUKKeyBindingHelper.createKeyBindingEntry(outer, altBinding, Text.literal("..."));
 				if (altEntry != null) {
 					List<ControlsListWidget.KeyBindingEntry> entries = NMUKKeyBindingHelper.getControlsListWidgetEntries();
 					if (entries != null) {
@@ -110,7 +107,7 @@ public class MixinKeyBindingEntry {
 			List<KeyBinding> alternatives = ((IKeyBinding) keyBinding).nmuk_getAlternatives();
 			List<KeyBinding> defaultAlternatives = new ArrayList<>(NMUKKeyBindingHelper.defaultAlternatives.get(keyBinding));
 			List<ControlsListWidget.KeyBindingEntry> entries = NMUKKeyBindingHelper.getControlsListWidgetEntries();
-			// noinspection ConstantConditions,RedundantCast
+			// noinspection ConstantConditions
 			int entryPos = entries.indexOf((ControlsListWidget.KeyBindingEntry) (Object) this);
 
 			int index;

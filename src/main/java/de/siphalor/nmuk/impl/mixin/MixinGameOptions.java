@@ -29,7 +29,6 @@ import net.minecraft.client.util.InputUtil;
 import org.apache.logging.log4j.Level;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Coerce;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
@@ -51,16 +50,16 @@ public class MixinGameOptions {
 	@Mutable
 	@Shadow
 	@Final
-	public KeyBinding[] keysAll;
+	public KeyBinding[] allKeys;
 
 	// Prevent nmuk keybindings from getting saved to the Vanilla options file
 	@Inject(
 			method = "accept",
-			at = @At(value = "FIELD", target = "Lnet/minecraft/client/option/GameOptions;keysAll:[Lnet/minecraft/client/option/KeyBinding;")
+			at = @At(value = "FIELD", target = "Lnet/minecraft/client/option/GameOptions;allKeys:[Lnet/minecraft/client/option/KeyBinding;")
 	)
 	public void removeNMUKBindings(CallbackInfo ci) {
-		tempKeysAll = keysAll;
-		keysAll = Arrays.stream(keysAll).filter(binding -> !((IKeyBinding) binding).nmuk_isAlternative()).toArray(KeyBinding[]::new);
+		tempKeysAll = allKeys;
+		allKeys = Arrays.stream(allKeys).filter(binding -> !((IKeyBinding) binding).nmuk_isAlternative()).toArray(KeyBinding[]::new);
 	}
 
 	@Inject(
@@ -68,7 +67,7 @@ public class MixinGameOptions {
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/sound/SoundCategory;values()[Lnet/minecraft/sound/SoundCategory;")
 	)
 	public void resetAllKeys(CallbackInfo ci) {
-		keysAll = tempKeysAll;
+		allKeys = tempKeysAll;
 	}
 
 	@Inject(
@@ -77,7 +76,7 @@ public class MixinGameOptions {
 	)
 	public void save(CallbackInfo ci) {
 		try (PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(new FileOutputStream(nmukOptionsFile), StandardCharsets.UTF_8))) {
-			for (KeyBinding binding : keysAll) {
+			for (KeyBinding binding : allKeys) {
 				if (((IKeyBinding) binding).nmuk_isAlternative()) {
 					printWriter.println("key_" + binding.getTranslationKey() + ":" + binding.getBoundKeyTranslationKey());
 				}
@@ -156,7 +155,7 @@ public class MixinGameOptions {
 			e.printStackTrace();
 		}
 		int newCount, oldCount;
-		for (KeyBinding binding : keysAll) {
+		for (KeyBinding binding : allKeys) {
 			newCount = alternativeCountMap.getOrDefault(binding, 0);
 			oldCount = ((IKeyBinding) binding).nmuk_getAlternativesCount();
 			if (oldCount > newCount) {
