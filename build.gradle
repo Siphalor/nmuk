@@ -154,7 +154,7 @@ if (project.hasProperty("siphalorCurseForgeApi")) {
 			/*for (version in ((String) project.mod_mc_versions).split(";")) {
 				addGameVersion(version)
 			}*/
-			addGameVersion("1.17")
+			addGameVersion("1.19-Snapshot")
 			relations {
 				embeddedLibrary "fabric-api"
 				optionalDependency "amecs"
