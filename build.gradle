@@ -53,7 +53,7 @@ dependencies {
 		include "net.fabricmc.fabric-api:" + dep.getKey() + ":" + dep.getValue()
 	}
 
-	modRuntime("com.github.astei:lazydfu:master-SNAPSHOT")
+	modLocalRuntime("com.github.astei:lazydfu:master-SNAPSHOT")
 
 	testmodImplementation sourceSets.main.output
 }
