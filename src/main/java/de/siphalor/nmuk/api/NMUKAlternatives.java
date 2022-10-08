@@ -17,14 +17,15 @@
 
 package de.siphalor.nmuk.api;
 
-import de.siphalor.nmuk.impl.IKeyBinding;
-import de.siphalor.nmuk.impl.NMUKKeyBindingHelper;
-import de.siphalor.nmuk.impl.mixin.KeyBindingAccessor;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
+import java.util.List;
+
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
+import de.siphalor.nmuk.impl.AlternativeKeyBinding;
+import de.siphalor.nmuk.impl.IKeyBinding;
+import de.siphalor.nmuk.impl.NMUKKeyBindingHelper;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.util.InputUtil;
 
 /**
  * Main API class of NMUK (No More Useless Keys).<br />
@@ -36,47 +37,109 @@ public class NMUKAlternatives {
 	 *
 	 * @param base The base keybinding to create an alternative for
 	 * @param code The keycode to use as default for the alternative
+	 * @return the new created keybinding
 	 */
+	public static KeyBinding createAndGet(KeyBinding base, int code) {
+		return createAndGet(base, InputUtil.Type.KEYSYM, code);
+	}
+
+	/**
+	 * Create an alternative keybinding with the given code and {@link InputUtil.Type#KEYSYM}.
+	 *
+	 * @param base The base keybinding to create an alternative for
+	 * @param code The keycode to use as default for the alternative
+	 */
+	@Deprecated
 	public static void create(KeyBinding base, int code) {
-		create(base, InputUtil.Type.KEYSYM, code);
+		createAndGet(base, code);
 	}
 
 	/**
 	 * Create an alternative keybinding with the given code and input type.
 	 *
-	 * @param base      The base keybinding to create an alternative for
+	 * @param base The base keybinding to create an alternative for
 	 * @param inputType The {@link InputUtil.Type} that defines the type of the code
-	 * @param code      The input code
+	 * @param code The input code
+	 * @return the new created keybinding
 	 */
-	public static void create(KeyBinding base, InputUtil.Type inputType, int code) {
-		KeyBinding alternative = NMUKKeyBindingHelper.createAlternativeKeyBinding(base, inputType, code);
-		NMUKKeyBindingHelper.registerKeyBinding(alternative);
+	public static KeyBinding createAndGet(KeyBinding base, InputUtil.Type inputType, int code) {
+		KeyBinding alternative = NMUKKeyBindingHelper.createAndAddAlternativeKeyBinding(base, inputType, code);
 		NMUKKeyBindingHelper.defaultAlternatives.put(base, alternative);
+		NMUKKeyBindingHelper.registerKeyBindingGUI(alternative);
+		return alternative;
+	}
+
+	/**
+	 * Create an alternative keybinding with the given code and input type.
+	 *
+	 * @param base The base keybinding to create an alternative for
+	 * @param inputType The {@link InputUtil.Type} that defines the type of the code
+	 * @param code The input code
+	 */
+	@Deprecated
+	public static void create(KeyBinding base, InputUtil.Type inputType, int code) {
+		createAndGet(base, inputType, code);
 	}
 
 	/**
 	 * Register and add the latter keybinding to the former.<br />
 	 * This is useful when using more complex keybinding trigger, e.g. in use with Amces.<br />
-	 * The translation key and the category of the alternative keybinding will be rewritten
-	 * and as such it must not be registered yet.
+	 * The translation key and the category of the alternative keybinding will be rewritten.
+	 * The keybinding might already be registered. In that case it is unregistered and registered again with the new identity.
 	 *
-	 * @param base        The base keybinding to create an alternative for
-	 * @param alternative The alternative keybinding. This keybinding MUST NOT be registered yet
+	 * @param base The base keybinding to create an alternative for
+	 * @param alternative The alternative keybinding
+	 * @return the alternative keybinding given
 	 */
-	public static void create(KeyBinding base, KeyBinding alternative) {
-		((KeyBindingAccessor) alternative).setTranslationKey(base.getTranslationKey() + "%" + ((IKeyBinding) base).nmuk_getNextChildId());
-		((KeyBindingAccessor) alternative).setCategory(base.getCategory());
-		((IKeyBinding) base).nmuk_addAlternative(alternative);
-		((IKeyBinding) alternative).nmuk_setParent(base);
-		NMUKKeyBindingHelper.registerKeyBinding(alternative);
+	public static <K extends KeyBinding> K createAndGet(KeyBinding base, K alternative) {
+		// unregister the alternative keybinding as it is known until now
+		NMUKKeyBindingHelper.unregisterKeyBindingQuerying(alternative);
+		NMUKKeyBindingHelper.unregisterKeyBindingGUI(alternative);
+
+		NMUKKeyBindingHelper.makeKeyBindingAlternativeOf(base, alternative, AlternativeKeyBinding.NO_ALTERNATIVE_ID, true);
 		NMUKKeyBindingHelper.defaultAlternatives.put(base, alternative);
+
+		NMUKKeyBindingHelper.registerKeyBindingQuerying(alternative);
+		NMUKKeyBindingHelper.registerKeyBindingGUI(alternative);
+		return alternative;
+	}
+
+	/**
+	 * Register and add the latter keybinding to the former.<br />
+	 * This is useful when using more complex keybinding trigger, e.g. in use with Amces.<br />
+	 * The translation key and the category of the alternative keybinding will be rewritten.
+	 * The keybinding might already be registered. In that case it is unregistered and registered again with the new identity.
+	 *
+	 * @param base The base keybinding to create an alternative for
+	 * @param alternative The alternative keybinding
+	 */
+	@Deprecated
+	public static void create(KeyBinding base, KeyBinding alternative) {
+		createAndGet(base, alternative);
+	}
+
+	/**
+	 * Remove the given {@code alternative} keybinding from the default alternatives list of the base.
+	 * The {@code alternative} keybinding will be unregistered if it was a default alternative of the base.
+	 *
+	 * @param base
+	 * @param alternative
+	 * @return whether the alternative was removed from the base. It will fail if the base did not contain the given {@code alternative} keybinding as an alternative
+	 */
+	public static boolean removeDefaultAlternative(KeyBinding base, KeyBinding alternative) {
+		boolean ret = NMUKKeyBindingHelper.defaultAlternatives.remove(base, alternative);
+		if (ret) {
+			NMUKKeyBindingHelper.unregisterKeyBindingQuerying(alternative);
+			NMUKKeyBindingHelper.unregisterKeyBindingGUI(alternative);
+		}
+		return ret;
 	}
 
 	/**
 	 * Returns whether the given keybinding is an alternative.
 	 *
 	 * @param binding A keybinding
-	 * @return Whether the given keybinding is an alternative
+	 * @return whether the given keybinding is an alternative
 	 */
 	public static boolean isAlternative(KeyBinding binding) {
 		return ((IKeyBinding) binding).nmuk_isAlternative();

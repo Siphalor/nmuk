@@ -1,0 +1,6 @@
+{
+	"nmuk.options.controls.reset.tooltip": "Halte Shift um auch alle Alternativen zurückzusetzen",
+	"nmuk.options.controls.bind_existing_keys_first": "Belege erst bereits existierende Tasten!",
+	"nmuk.options.controls.main_key_unbound": "Haupt-Taste is nicht belegt",
+	"nmuk.options.controls.children_key_unbound": "Alternative Taste #%d ist nicht belegt"
+}

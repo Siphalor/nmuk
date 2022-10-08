@@ -21,8 +21,8 @@ repositories {
 }
 
 dependencies {
-   modImplementation "de.siphalor:amecsapi-1.15:1+"
-   include "de.siphalor:amecsapi-1.15:1+"
+   modImplementation "de.siphalor:nmuk-1.17:1.0.1+"
+   include "de.siphalor:nmuk-1.17:1.0.1+"
 }
 ```
 

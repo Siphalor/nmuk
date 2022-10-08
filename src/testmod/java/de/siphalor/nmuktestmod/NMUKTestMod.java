@@ -32,7 +32,7 @@ public class NMUKTestMod implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		KeyBinding kbd = KeyBindingHelper.registerKeyBinding(new KeyBinding(MOD_ID + ".test", InputUtil.Type.KEYSYM, 86, "key.categories.movement"));
-		NMUKAlternatives.create(kbd, 85);
-		NMUKAlternatives.create(kbd, new AmecsKeyBinding(new Identifier(MOD_ID, ""), InputUtil.Type.KEYSYM, 86, "", new KeyModifiers(false, true, true)));
+		NMUKAlternatives.createAndGet(kbd, 85);
+		NMUKAlternatives.createAndGet(kbd, new AmecsKeyBinding(new Identifier(MOD_ID, ""), InputUtil.Type.KEYSYM, 86, "", new KeyModifiers(false, true, true)));
 	}
 }

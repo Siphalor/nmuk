@@ -17,16 +17,17 @@
 
 package de.siphalor.nmuk.impl;
 
-import net.minecraft.client.option.KeyBinding;
+import java.util.List;
+
 import org.jetbrains.annotations.ApiStatus;
 
-import java.util.List;
+import net.minecraft.client.option.KeyBinding;
 
 @ApiStatus.Internal
 public interface IKeyBinding {
-	short nmuk_getNextChildId();
+	int nmuk_getNextChildId();
 
-	void nmuk_setNextChildId(short nextChildId);
+	void nmuk_setNextChildId(int nextChildId);
 
 	boolean nmuk_isAlternative();
 
@@ -38,9 +39,23 @@ public interface IKeyBinding {
 
 	int nmuk_getAlternativesCount();
 
-	void nmuk_removeAlternative(KeyBinding binding);
+	/**
+	 *
+	 * @param binding
+	 * @return the index at which the binding was found in the parent's alternatives
+	 */
+	int nmuk_removeAlternative(KeyBinding binding);
 
 	void nmuk_addAlternative(KeyBinding binding);
 
+	/**
+	 * This method should only be used for the controls gui to determine the entry position
+	 *
+	 * @return the index in the parent's children list
+	 */
 	int nmuk_getIndexInParent();
+
+	int nmuk_getAlternativeId();
+
+	void nmuk_setAlternativeId(int alternativeId);
 }
