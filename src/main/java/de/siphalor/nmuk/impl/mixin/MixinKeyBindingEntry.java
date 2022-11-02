@@ -66,16 +66,16 @@ public class MixinKeyBindingEntry {
 		IKeyBinding iKeyBinding = (IKeyBinding) binding;
 		if (iKeyBinding.nmuk_isAlternative()) {
 			bindingName = ENTRY_NAME;
-			alternativesButton = new ButtonWidget(0, 0, 20, 20, Text.literal("x"), button -> {
+			alternativesButton = ButtonWidget.createBuilder(Text.literal("x"), button -> {
 				((IKeyBinding) iKeyBinding.nmuk_getParent()).nmuk_removeAlternative(binding);
 				NMUKKeyBindingHelper.removeKeyBinding(binding);
 				List<ControlsListWidget.KeyBindingEntry> entries = NMUKKeyBindingHelper.getControlsListWidgetEntries();
 				if (entries != null) {
 					entries.remove((ControlsListWidget.KeyBindingEntry) (Object) this);
 				}
-			});
+			}).setSize(20, 20).build();
 		} else {
-			alternativesButton = new ButtonWidget(0, 0, 20, 20, Text.literal("+"), button -> {
+			alternativesButton = ButtonWidget.createBuilder(Text.literal("+"), button -> {
 				KeyBinding altBinding = NMUKKeyBindingHelper.createAlternativeKeyBinding(binding);
 				NMUKKeyBindingHelper.registerKeyBinding(altBinding);
 				ControlsListWidget.KeyBindingEntry altEntry = NMUKKeyBindingHelper.createKeyBindingEntry(outer, altBinding, Text.literal("..."));
@@ -92,7 +92,7 @@ public class MixinKeyBindingEntry {
 						}
 					}
 				}
-			});
+			}).setSize(20, 20).build();
 			//noinspection ConstantConditions
 			((ButtonWidgetAccessor) resetButton).setTooltipSupplier((button, matrices, mouseX, mouseY) ->
 					MinecraftClient.getInstance().currentScreen.renderTooltip(matrices, RESET_TOOLTIP, mouseX, mouseY)
@@ -142,8 +142,8 @@ public class MixinKeyBindingEntry {
 
 	@Inject(method = "render", at = @At("RETURN"))
 	public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta, CallbackInfo callbackInfo) {
-		alternativesButton.y = resetButton.y;
-		alternativesButton.x = resetButton.x + resetButton.getWidth() + 10;
+		alternativesButton.setY(resetButton.getY());
+		alternativesButton.setX(resetButton.getX() + resetButton.getWidth() + 10);
 		alternativesButton.render(matrices, mouseX, mouseY, tickDelta);
 	}
 
