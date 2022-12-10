@@ -24,6 +24,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.option.ControlsListWidget;
+import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.math.MatrixStack;
@@ -66,16 +67,16 @@ public class MixinKeyBindingEntry {
 		IKeyBinding iKeyBinding = (IKeyBinding) binding;
 		if (iKeyBinding.nmuk_isAlternative()) {
 			bindingName = ENTRY_NAME;
-			alternativesButton = ButtonWidget.createBuilder(Text.literal("x"), button -> {
+			alternativesButton = ButtonWidget.builder(Text.literal("x"), button -> {
 				((IKeyBinding) iKeyBinding.nmuk_getParent()).nmuk_removeAlternative(binding);
 				NMUKKeyBindingHelper.removeKeyBinding(binding);
 				List<ControlsListWidget.KeyBindingEntry> entries = NMUKKeyBindingHelper.getControlsListWidgetEntries();
 				if (entries != null) {
 					entries.remove((ControlsListWidget.KeyBindingEntry) (Object) this);
 				}
-			}).setSize(20, 20).build();
+			}).size(20, 20).build();
 		} else {
-			alternativesButton = ButtonWidget.createBuilder(Text.literal("+"), button -> {
+			alternativesButton = ButtonWidget.builder(Text.literal("+"), button -> {
 				KeyBinding altBinding = NMUKKeyBindingHelper.createAlternativeKeyBinding(binding);
 				NMUKKeyBindingHelper.registerKeyBinding(altBinding);
 				ControlsListWidget.KeyBindingEntry altEntry = NMUKKeyBindingHelper.createKeyBindingEntry(outer, altBinding, Text.literal("..."));
@@ -92,11 +93,8 @@ public class MixinKeyBindingEntry {
 						}
 					}
 				}
-			}).setSize(20, 20).build();
-			//noinspection ConstantConditions
-			((ButtonWidgetAccessor) resetButton).setTooltipSupplier((button, matrices, mouseX, mouseY) ->
-					MinecraftClient.getInstance().currentScreen.renderTooltip(matrices, RESET_TOOLTIP, mouseX, mouseY)
-			);
+			}).size(20, 20).build();
+			resetButton.setTooltip(Tooltip.of(RESET_TOOLTIP));
 		}
 	}
 
