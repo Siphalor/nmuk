@@ -37,7 +37,7 @@ dependencies {
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	modImplementation("de.siphalor:amecsapi-${project.minecraft_major_version}:1.1+") {
+	modLocalRuntime("de.siphalor:amecsapi-${project.minecraft_major_version}:1.1+") {
 		exclude group: "net.fabricmc.fabric-api"
 		exclude module: "nmuk-${project.minecraft_major_version}"
 	}
