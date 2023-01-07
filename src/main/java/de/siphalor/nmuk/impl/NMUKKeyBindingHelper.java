@@ -48,7 +48,7 @@ public class NMUKKeyBindingHelper {
 	public static final Multimap<KeyBinding, KeyBinding> defaultAlternatives = Multimaps.newSetMultimap(new HashMap<>(), HashSet::new);
 
 	public static void removeKeyBinding(KeyBinding binding) {
-		List<KeyBinding> moddedKeyBindings = KeyBindingRegistryImplAccessor.getModdedKeyBindings();
+		List<KeyBinding> moddedKeyBindings = KeyBindingRegistryImplAccessor.getMODDED_KEY_BINDINGS();
 		{
 			//noinspection ConstantConditions
 			boolean success = moddedKeyBindings.remove(binding);
