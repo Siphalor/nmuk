@@ -32,6 +32,7 @@ import net.minecraft.client.gui.screen.options.ControlsListWidget;
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.text.Text;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.Level;
 import org.jetbrains.annotations.ApiStatus;
