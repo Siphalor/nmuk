@@ -28,5 +28,8 @@
 		"fabricloader": ">=0.4.0",
 		"fabric-key-binding-api-v1": ">=1.0.25",
 		"minecraft": "<=1.19.3"
+	},
+	"conflicts": {
+		"amecsapi": "<=1.3.999"
 	}
 }
