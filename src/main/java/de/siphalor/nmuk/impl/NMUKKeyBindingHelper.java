@@ -25,6 +25,7 @@ import de.siphalor.nmuk.impl.mixin.EntryListWidgetAccessor;
 import de.siphalor.nmuk.impl.mixin.GameOptionsAccessor;
 import de.siphalor.nmuk.impl.mixin.KeyBindingRegistryImplAccessor;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.option.ControlsListWidget;
@@ -46,6 +47,7 @@ import java.util.List;
 @ApiStatus.Internal
 public class NMUKKeyBindingHelper {
 	public static final Multimap<KeyBinding, KeyBinding> defaultAlternatives = Multimaps.newSetMultimap(new HashMap<>(), HashSet::new);
+	private static final boolean isAmecsLoaded = FabricLoader.getInstance().isModLoaded("amecsapi");
 
 	public static void removeKeyBinding(KeyBinding binding) {
 		List<KeyBinding> moddedKeyBindings = KeyBindingRegistryImplAccessor.getMODDED_KEY_BINDINGS();
@@ -96,6 +98,9 @@ public class NMUKKeyBindingHelper {
 
 	public static void resetSingleKeyBinding(KeyBinding keyBinding) {
 		keyBinding.setBoundKey(keyBinding.getDefaultKey());
+		if (isAmecsLoaded) {
+			AmecsProxy.resetKeyModifiers(keyBinding);
+		}
 	}
 
 	public static KeyBinding createAlternativeKeyBinding(KeyBinding base) {
