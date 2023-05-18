@@ -39,7 +39,7 @@ dependencies {
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	modImplementation("de.siphalor:amecsapi-${project.minecraft_major_version}:1.4.0+mc1.19.4") {
+	modImplementation("de.siphalor:amecsapi-${project.minecraft_major_version}:1.4.0+mc1.20-pre1") {
 		exclude group: "net.fabricmc.fabric-api"
 		exclude module: "nmuk-${project.minecraft_major_version}"
 	}
@@ -140,7 +140,8 @@ if (project.hasProperty("curseforgeToken")) {
 			changelogType = "markdown"
 			changelog = project.getChangelog()
 			addGameVersion("Fabric")
-			for (version in ((String) project.mod_mc_versions).split(";")) {
+            String mcVersions = project.hasProperty("curseforge_mc_versions") ? project.curseforge_mc_versions : project.mod_mc_versions
+			for (version in mcVersions.split(";")) {
 				addGameVersion(version)
 			}
 			relations {

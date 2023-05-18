@@ -21,13 +21,13 @@ import com.google.common.collect.ImmutableList;
 import de.siphalor.nmuk.impl.IKeyBinding;
 import de.siphalor.nmuk.impl.NMUKKeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.option.ControlsListWidget;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
@@ -139,10 +139,10 @@ public class MixinKeyBindingEntry {
 	}
 
 	@Inject(method = "render", at = @At("RETURN"))
-	public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta, CallbackInfo callbackInfo) {
+	public void render(DrawContext drawContext, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta, CallbackInfo callbackInfo) {
 		alternativesButton.setY(resetButton.getY());
 		alternativesButton.setX(resetButton.getX() + resetButton.getWidth() + 10);
-		alternativesButton.render(matrices, mouseX, mouseY, tickDelta);
+		alternativesButton.render(drawContext, mouseX, mouseY, tickDelta);
 	}
 
 	@Inject(method = "children", at = @At("RETURN"), cancellable = true)
