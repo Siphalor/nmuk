@@ -7,7 +7,6 @@
 		"EntryListWidgetAccessor",
 		"GameOptionsAccessor",
 		"KeyBindingAccessor",
-		"KeyBindingRegistryImplAccessor",
 		"MixinGameOptions",
 		"MixinKeyBinding",
 		"MixinKeyBindingEntry"

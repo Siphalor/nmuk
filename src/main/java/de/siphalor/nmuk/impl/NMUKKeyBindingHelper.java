@@ -19,12 +19,9 @@ package de.siphalor.nmuk.impl;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
-import de.siphalor.nmuk.NMUK;
-import de.siphalor.nmuk.impl.mixin.KeybindsScreenAccessor;
 import de.siphalor.nmuk.impl.mixin.EntryListWidgetAccessor;
 import de.siphalor.nmuk.impl.mixin.GameOptionsAccessor;
-import de.siphalor.nmuk.impl.mixin.KeyBindingRegistryImplAccessor;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import de.siphalor.nmuk.impl.mixin.KeybindsScreenAccessor;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -34,7 +31,6 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.logging.log4j.Level;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.lang.reflect.Constructor;
@@ -50,14 +46,6 @@ public class NMUKKeyBindingHelper {
 	private static final boolean isAmecsLoaded = FabricLoader.getInstance().isModLoaded("amecsapi");
 
 	public static void removeKeyBinding(KeyBinding binding) {
-		List<KeyBinding> moddedKeyBindings = KeyBindingRegistryImplAccessor.getMODDED_KEY_BINDINGS();
-		{
-			//noinspection ConstantConditions
-			boolean success = moddedKeyBindings.remove(binding);
-			if (!success) {
-				NMUK.log(Level.ERROR, "Failed to remove modded keybinding!");
-			}
-		}
 		GameOptionsAccessor options = (GameOptionsAccessor) MinecraftClient.getInstance().options;
 		KeyBinding[] keysAll = options.getAllKeys();
 		int index = ArrayUtils.indexOf(keysAll, binding);
@@ -69,7 +57,6 @@ public class NMUKKeyBindingHelper {
 	}
 
 	public static void registerKeyBinding(KeyBinding binding) {
-		KeyBindingHelper.registerKeyBinding(binding);
 		GameOptionsAccessor options = (GameOptionsAccessor) MinecraftClient.getInstance().options;
 		if (options != null) { // Game is during initialization - this is handled by Fapi already
 			KeyBinding[] keysAll = options.getAllKeys();
@@ -88,7 +75,6 @@ public class NMUKKeyBindingHelper {
 		System.arraycopy(keysAll, 0, newKeysAll, 0, keysAll.length);
 		int i = keysAll.length;
 		for (KeyBinding binding : bindings) {
-			KeyBindingHelper.registerKeyBinding(binding);
 			newKeysAll[i] = binding;
 			i++;
 		}

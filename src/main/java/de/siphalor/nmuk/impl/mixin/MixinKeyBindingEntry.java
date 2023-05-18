@@ -150,18 +150,8 @@ public class MixinKeyBindingEntry {
 		callbackInfoReturnable.setReturnValue(ImmutableList.of(editButton, resetButton, alternativesButton));
 	}
 
-	// ordinal 2 is required because in the byte code the second return statement is unfolded to a condition with two constant returns
-	@Inject(method = "mouseClicked", at = @At(value = "RETURN", ordinal = 2), require = 1, cancellable = true)
-	public void mouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
-		if (alternativesButton.mouseClicked(mouseX, mouseY, button)) {
-			cir.setReturnValue(true);
-		}
-	}
-
-	@Inject(method = "mouseReleased", at = @At("RETURN"), cancellable = true)
-	public void mouseReleased(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
-		if (alternativesButton.mouseReleased(mouseX, mouseY, button)) {
-			cir.setReturnValue(true);
-		}
-	}
+    @Inject(method = "selectableChildren", at = @At("RETURN"), cancellable = true)
+    public void selectableChildren(CallbackInfoReturnable<List<? extends Element>> callbackInfoReturnable) {
+        callbackInfoReturnable.setReturnValue(ImmutableList.of(editButton, resetButton, alternativesButton));
+    }
 }
