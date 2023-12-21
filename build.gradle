@@ -66,6 +66,7 @@ processResources {
 
 	afterEvaluate {
 		from(sourceSets.main.resources.srcDirs) {
+			exclude "*.svg"
 			include "fabric.mod.json"
 			expand "version": version
 			duplicatesStrategy DuplicatesStrategy.INCLUDE
