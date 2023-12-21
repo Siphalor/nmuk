@@ -1,5 +1,5 @@
 <div align="center">
-<img alt="Logo" src="src/main/resources/assets/nmuk/icon.png" />
+<img alt="Logo" src="src/main/resources/assets/nmuk/icon.svg" />
 
 # No More Useless Keys
 
