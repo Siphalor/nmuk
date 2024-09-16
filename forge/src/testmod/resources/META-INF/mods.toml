@@ -1,0 +1,10 @@
+modLoader="javafml" #mandatory
+loaderVersion="${forge_version}"
+license="Apache-2.0"
+
+[[mods]] #mandatory
+modId="${mod_id}_testmod" #mandatory
+version="0.0.0" #mandatory
+displayName="${mod_name}" #mandatory
+authors="${mod_authors}" #optional
+description='''Test Mod'''

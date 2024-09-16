@@ -1,0 +1,15 @@
+{
+	"required": true,
+	"minVersion": "0.8",
+	"package": "de.siphalor.nmuk.impl.forge.mixin",
+	"compatibilityLevel": "JAVA_8",
+	"mixins": [],
+	"client": [
+		"MixinKeyBindingForge",
+		"MixinGameOptionsForge"
+	],
+	"server": [],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

@@ -1,0 +1,27 @@
+modLoader="javafml" #mandatory
+loaderVersion="${forge_version}"
+license="Apache-2.0"
+
+[[mods]] #mandatory
+modId="${mod_id}" #mandatory
+version="${mod_version}" #mandatory
+displayName="${mod_name}" #mandatory
+authors="${mod_authors}" #optional
+description='''${mod_description}'''
+displayURL="https://github.com/Siphalor/nmuk" #optional
+issueTrackerURL="https://github.com/Siphalor/nmuk/issues" #optional
+logoFile="icon.png" #optional
+
+[[dependencies.${mod_id}]] #optional
+modId="forge" #mandatory
+mandatory=true #mandatory
+versionRange="[${forge_version},)" #mandatory
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.${mod_id}]]
+modId="minecraft"
+mandatory=true
+versionRange="${minecraft_version_range}"
+ordering="NONE"
+side="BOTH"
